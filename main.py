@@ -13,15 +13,23 @@ window = pygame.display.set_mode((window_width, window_height))
 class StartScreen:
     def __init__(self, window):
         self.window = window
-        self.bg_color = (255, 165, 0)  
+        self.background = pygame.image.load(os.path.join('game_assests', 'start_screen_background.jpg'))
+        self.background = pygame.transform.scale(self.background, (window_width, window_height))
         self.font = pygame.font.SysFont(None, 55)
         self.title_text = self.font.render('Tower Defense Game', True, (255, 255, 255))
         self.start_text = self.font.render('Click to Start', True, (255, 255, 255)) 
 
     def render(self):
-        self.window.fill(self.bg_color)
-        self.window.blit(self.title_text, (window_width // 2 - self.title_text.get_width() // 2, 200))
-        self.window.blit(self.start_text, (window_width // 2 - self.start_text.get_width() // 2, 300))
+        self.window.blit(self.background, (0, 0))
+        self.window.blit(self.title_text, (window_width // 2 - self.title_text.get_width() // 2, 100))
+        start_text_rect = self.start_text.get_rect(center=(window_width // 2, 400))
+        rect_x = start_text_rect.x - 10
+        rect_y = start_text_rect.y - 10
+        rect_width = start_text_rect.width + 20
+        rect_height = start_text_rect.height + 20
+
+        pygame.draw.rect(self.window, (39, 145, 39), (rect_x, rect_y, rect_width, rect_height))
+        self.window.blit(self.start_text, start_text_rect.topleft)
         pygame.display.update()
 
     def check_for_click(self):
