@@ -31,6 +31,7 @@ class StartScreen:
         pygame.draw.rect(self.window, (39, 145, 39), (rect_x, rect_y, rect_width, rect_height))
         self.window.blit(self.start_text, start_text_rect.topleft)
         pygame.display.update()
+        self.start_button_rect = pygame.Rect(rect_x, rect_y, rect_width, rect_height)
 
     def check_for_click(self):
         for event in pygame.event.get():
@@ -38,8 +39,11 @@ class StartScreen:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                return True
+                mouse_pos = pygame.mouse.get_pos()
+                if self.start_button_rect.collidepoint(mouse_pos):
+                    return True
         return False
+
 
 
 class MainGameScreen:
