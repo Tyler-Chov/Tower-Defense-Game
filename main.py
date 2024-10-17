@@ -60,6 +60,13 @@ class MainGameScreen:
         self.window.blit(self.background, (0, 0))
         self.window.blit(self.health_text, (10, 10))
         self.window.blit(self.money_text, (10, 50))
+
+        rect_x = 0
+        rect_y = 500
+        rect_width = 800
+        rect_height = 100
+        pygame.draw.rect(self.window, (200, 200, 100), (rect_x, rect_y, rect_width, rect_height))
+
         pygame.display.update()
     
     def check_for_click(self):
