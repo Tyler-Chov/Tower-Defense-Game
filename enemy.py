@@ -1,61 +1,60 @@
 class Enemy:
     def __init__(self, health, speed, strength, path):
-        self.health = health
-        self.speed = speed
-        self.strength = strength
-        self.path = path
-        self.position = self.path[0]
-        self.path_index = 0
-        self.status = True
-        self.resource_worth = health * 3
+        self._health = health
+        self._speed = speed
+        self._strength = strength
+        self._path = path
+        self._position = self._path[0]
+        self._path_index = 0
+        self._status = True
+        self._resource_worth = health * 3
 
-    def move(self):
-        if self.path_index < len(self.path) - 1:
-            current_x, current_y = self.position
-            next_x, next_y = self.path[self.path_index + 1]
+    def _move(self):
+        if self._path_index < len(self._path) - 1:
+            _current_x, _current_y = self._position
+            _next_x, _next_y = self._path[self._path_index + 1]
             # Calculate direction to the next point
-            direction_x = next_x - current_x
-            direction_y = next_y - current_y
+            _direction_x = _next_x - _current_x
+            _direction_y = _next_y - _current_y
             # Normalize direction and scale by speed
-            distance = (direction_x ** 2 + direction_y ** 2) ** 0.5
-            if distance != 0:
-                direction_x /= distance
-                direction_y /= distance
+            _distance = (_direction_x ** 2 + _direction_y ** 2) ** 0.5
+            if _distance != 0:
+                _direction_x /= _distance
+                _direction_y /= _distance
             # Move the enemy by speed units in the direction of the next point
-            new_x = current_x + direction_x * self.speed
-            new_y = current_y + direction_y * self.speed
+            _new_x = _current_x + _direction_x * self._speed
+            _new_y = _current_y + _direction_y * self._speed
             # Update position
-            self.position = (new_x, new_y)
+            self._position = (_new_x, _new_y)
             # Check if the enemy has reached the next point
-            if distance <= self.speed:
-                self.path_index += 1  # Move to the next point on the path
+            if _distance <= self._speed:
+                self._path_index += 1  # Move to the next point on the path
         else:
             # Reached the end of the path
-            self.damage_base(self.strength)
+            self.damage_base(self._strength)
 
     def take_damage(self, damage, player):
-        self.health = self.health - damage
-        if self.health <= 0:
+        self._health = self._health - damage
+        if self._health <= 0:
             self.kill_enemy(player)
 
-    def kill_enemy(self, player):
-        self.status = False
-        self.reward_resources(player)
+    def kill_enemy(self, base):
+        self._status = False
+        self.reward_resources(base)
 
-    def reward_resources(self, player):
-        player.resources = player.resources + self.resource_worth
+    def reward_resources(self, base):
+        base.add_money(self._resource_worth)
 
     def damage_base(self, base):
-        base.health = base.health - self.strength
-        self.status = False
-        base.check_base()
+        base.remove_health(self._strength)
+        self._status = False
 
     def is_alive(self):
-        return self.status
+        return self._status
 
 
-path = ()
-circle = Enemy(1, 2, 1, path)
-square = Enemy(3, 1, 2, path)
-triangle = Enemy(2, 4, 1, path)
+path = ()  # placeholder for path, will be pulled from main class
+_circle = Enemy(1, 2, 1, path)
+_square = Enemy(3, 1, 2, path)
+_triangle = Enemy(2, 4, 1, path)
 
