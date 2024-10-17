@@ -49,7 +49,7 @@ class MainGameScreen:
     def __init__(self, window):
         self.window = window
         self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
-        self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         self.font = pygame.font.SysFont(None, 30)
         self.health = 0 
         self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
@@ -61,11 +61,18 @@ class MainGameScreen:
         self.window.blit(self.health_text, (10, 10))
         self.window.blit(self.money_text, (10, 50))
 
-        rect_x = 0
-        rect_y = 500
-        rect_width = 800
-        rect_height = 100
-        pygame.draw.rect(self.window, (200, 200, 100), (rect_x, rect_y, rect_width, rect_height))
+        bottom_rect_width = window_width
+        bottom_rect_height = 100
+        bottom_rect_x = window_width - bottom_rect_width
+        bottom_rect_y = window_height - bottom_rect_height
+        pygame.draw.rect(self.window, (200, 200, 200), (bottom_rect_x, bottom_rect_y, bottom_rect_width, bottom_rect_height))
+
+    
+        Side_rect_width = 100
+        Side_rect_height = window_height
+        Side_rect_x = window_width - Side_rect_width
+        Side_rect_y = window_height
+        pygame.draw.rect(self.window, (200, 200, 200), (Side_rect_x, Side_rect_y, Side_rect_width, Side_rect_height))
 
         pygame.display.update()
     
