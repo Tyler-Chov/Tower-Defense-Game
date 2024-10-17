@@ -9,7 +9,6 @@ pygame.display.set_caption('Tower Defense Game')
 pygame.init()
 window = pygame.display.set_mode((window_width, window_height))
 
-
 class StartScreen:
     def __init__(self, window):
         self.window = window
@@ -51,9 +50,16 @@ class MainGameScreen:
         self.window = window
         self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
         self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        self.font = pygame.font.SysFont(None, 30)
+        self.health = 0 
+        self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
+        self.money = 0 
+        self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
     def render(self):
         self.window.blit(self.background, (0, 0))
+        self.window.blit(self.health_text, (10, 10))
+        self.window.blit(self.money_text, (10, 50))
         pygame.display.update()
     
     def check_for_click(self):
@@ -63,12 +69,35 @@ class MainGameScreen:
                 sys.exit()
         return False
 
+    def remove_health(self, health):
+        self.health -= health
+        self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
+        if self.health <= 0:
+            self.game_over()
 
+    def add_money(self, money):
+        self.money += money
+        self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
+
+    def remove_money(self, money):
+        self.money -= money
+        self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
+
+    def set_health(self, health):
+        self.health = health
+        self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
+
+    def set_money(self, money):
+        self.money = money
+        self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
+    
+        
 def main():
     start_screen = StartScreen(window)
     main_game_screen = MainGameScreen(window)
     game_state = 'start_screen'
-    
+    main_game_screen.set_health(100)
+    main_game_screen.set_money(500)
     while True:
         if game_state == 'start_screen':
             start_screen.render()
@@ -82,7 +111,6 @@ def main():
                     pygame.quit()
                     sys.exit()
         fpsClock.tick(FPS)
-
 
 if __name__ == '__main__':
     main()
