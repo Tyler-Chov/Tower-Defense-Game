@@ -7,7 +7,7 @@ class Enemy:
         self.position = self.path[0]
         self.path_index = 0
         self.status = True
-        self.resource_worth = strength * 3
+        self.resource_worth = health * 3
 
     def move(self):
         if self.path_index < len(self.path) - 1:
@@ -52,4 +52,10 @@ class Enemy:
 
     def is_alive(self):
         return self.status
+
+
+path = ()
+circle = Enemy(1, 2, 1, path)
+square = Enemy(3, 1, 2, path)
+triangle = Enemy(2, 4, 1, path)
 
