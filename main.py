@@ -55,6 +55,8 @@ class MainGameScreen:
         self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
         self.money = 0 
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
+        self.wave = 0 
+        self.wave_text = self.font.render(f'wave: {self.wave}', True, (255, 255, 255))
 
     def render(self):
         self.window.blit(self.background, (0, 0))
@@ -87,6 +89,7 @@ class MainGameScreen:
         
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
+        self.window.blit(self.wave_text, (705, 70))
 
 
         """
