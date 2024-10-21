@@ -50,7 +50,7 @@ class MainGameScreen:
         self.window = window
         self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
         self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
-        self.font = pygame.font.SysFont(None, 30)
+        self.font = pygame.font.SysFont(None, 24)
         self.health = 0 
         self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
         self.money = 0 
@@ -58,21 +58,51 @@ class MainGameScreen:
 
     def render(self):
         self.window.blit(self.background, (0, 0))
-        self.window.blit(self.health_text, (10, 10))
-        self.window.blit(self.money_text, (10, 50))
-
+        
+        # bottom bar menu position and dimension
         bottom_rect_width = window_width
         bottom_rect_height = 100
         bottom_rect_x = window_width - bottom_rect_width
         bottom_rect_y = window_height - bottom_rect_height
-        pygame.draw.rect(self.window, (200, 200, 200), (bottom_rect_x, bottom_rect_y, bottom_rect_width, bottom_rect_height))
+        pygame.draw.rect(self.window, (150, 150, 150), (bottom_rect_x, bottom_rect_y, bottom_rect_width, bottom_rect_height))
 
-    
+        # side bar menu position and dimension
         Side_rect_width = 100
         Side_rect_height = window_height
         Side_rect_x = window_width - Side_rect_width
-        Side_rect_y = window_height
-        pygame.draw.rect(self.window, (200, 200, 200), (Side_rect_x, Side_rect_y, Side_rect_width, Side_rect_height))
+        Side_rect_y = 0
+        pygame.draw.rect(self.window, (150, 150, 150), (Side_rect_x, Side_rect_y, Side_rect_width, Side_rect_height))
+
+        top_box_width = 100
+        top_box_height = 5
+        top_box_x = 700
+        top_box_y = 500
+        pygame.draw.rect(self.window, (100, 100, 100), (top_box_x, top_box_y, top_box_width, top_box_height))
+
+        side_box_width = 5
+        side_box_height = 100
+        side_box_x = 700
+        side_box_y = 505
+        pygame.draw.rect(self.window, (100, 100, 100), (side_box_x, side_box_y, side_box_width, side_box_height))
+        
+        self.window.blit(self.health_text, (705, 10))
+        self.window.blit(self.money_text, (705, 40))
+
+
+        """
+        # potential code for pause button hitbox
+        top_pause_box_width = 50
+        top_pause_box_height = 5
+        top_pause_box_x = 725
+        top_pause_box_y = 525
+        pygame.draw.rect(self.window, (0, 0, 0), (top_pause_box_x, top_pause_box_y, top_pause_box_width, top_pause_box_height))
+
+        side_pause_box_width = 5
+        side_pause_box_height = 50
+        side_pause_box_x = 7
+        side_pause_box_y = 500
+        pygame.draw.rect(self.window, (0, 0, 0), (side_pause_box_x, side_pause_box_y, side_pause_box_width, side_pause_box_height))
+        """
 
         pygame.display.update()
     
