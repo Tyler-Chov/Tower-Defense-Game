@@ -60,32 +60,28 @@ class MainGameScreen:
 
     def render(self):
         self.window.blit(self.background, (0, 0))
-        
-        # bottom bar menu position and dimension
-        bottom_rect_width = window_width
-        bottom_rect_height = 100
-        bottom_rect_x = window_width - bottom_rect_width
-        bottom_rect_y = window_height - bottom_rect_height
-        pygame.draw.rect(self.window, (150, 150, 150), (bottom_rect_x, bottom_rect_y, bottom_rect_width, bottom_rect_height))
 
-        # side bar menu position and dimension
-        Side_rect_width = 100
-        Side_rect_height = window_height
-        Side_rect_x = window_width - Side_rect_width
-        Side_rect_y = 0
-        pygame.draw.rect(self.window, (150, 150, 150), (Side_rect_x, Side_rect_y, Side_rect_width, Side_rect_height))
+        class Rectangle():
+            def __init__(self, x, y, width, height, color):
+                self.x = x 
+                self.y = y
+                self.width = width
+                self.height = height
+                self.color = color
 
-        top_box_width = 100
-        top_box_height = 5
-        top_box_x = 700
-        top_box_y = 500
-        pygame.draw.rect(self.window, (100, 100, 100), (top_box_x, top_box_y, top_box_width, top_box_height))
+            def draw(self):
+                pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
 
-        side_box_width = 5
-        side_box_height = 100
-        side_box_x = 700
-        side_box_y = 505
-        pygame.draw.rect(self.window, (100, 100, 100), (side_box_x, side_box_y, side_box_width, side_box_height))
+        # create and draw menus
+        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150,150,150))
+        side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150,150,150))
+        bottom_bar.draw()
+        side_bar.draw()
+
+        top_box = Rectangle(700, 495, 100, 5, (100,100,100))
+        side_box = Rectangle(695, 500, 5, 100, (100,100,100))
+        top_box.draw()
+        side_box.draw()
         
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
