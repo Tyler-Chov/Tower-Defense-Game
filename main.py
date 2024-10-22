@@ -1,4 +1,4 @@
-import pygame, sys, os
+import pygame, sys, os, button
 
 FPS = 60
 fpsClock = pygame.time.Clock()
@@ -57,6 +57,9 @@ class MainGameScreen:
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
         self.wave = 0 
         self.wave_text = self.font.render(f'wave: {self.wave}', True, (255, 255, 255))
+        pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha() # not working because file isn't suppourted
+        self.pause_button = button.Button(710, 510, pause_img, 0.15 )
+
 
     def render(self):
         self.window.blit(self.background, (0, 0))
@@ -82,6 +85,7 @@ class MainGameScreen:
         side_box = Rectangle(695, 500, 5, 100, (100,100,100))
         top_box.draw()
         side_box.draw()
+        self.pause_button.draw(window)
         
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
