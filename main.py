@@ -59,6 +59,7 @@ class MainGameScreen:
         self.wave_text = self.font.render(f'wave: {self.wave}', True, (255, 255, 255))
         pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha() # not working because file isn't suppourted
         self.pause_button = button.Button(710, 510, pause_img, 0.15 )
+        self.pause = True
 
 
     def render(self):
@@ -85,27 +86,16 @@ class MainGameScreen:
         side_box = Rectangle(695, 500, 5, 100, (100,100,100))
         top_box.draw()
         side_box.draw()
-        self.pause_button.draw(window)
-        
+        if self.pause_button.draw(window): # checks if the pause button is clicked
+            print("button hit")
+            if self.pause == True:
+                self.pause = False
+            elif self.pause == False:
+                self.pause = True
+            print(self.pause)
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
-
-
-        """
-        # potential code for pause button hitbox
-        top_pause_box_width = 50
-        top_pause_box_height = 5
-        top_pause_box_x = 725
-        top_pause_box_y = 525
-        pygame.draw.rect(self.window, (0, 0, 0), (top_pause_box_x, top_pause_box_y, top_pause_box_width, top_pause_box_height))
-
-        side_pause_box_width = 5
-        side_pause_box_height = 50
-        side_pause_box_x = 7
-        side_pause_box_y = 500
-        pygame.draw.rect(self.window, (0, 0, 0), (side_pause_box_x, side_pause_box_y, side_pause_box_width, side_pause_box_height))
-        """
 
         pygame.display.update()
     
@@ -153,6 +143,7 @@ def main():
                 
         elif game_state == 'main_game':
             main_game_screen.render()
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
