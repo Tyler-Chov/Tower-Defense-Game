@@ -1,3 +1,6 @@
+import pygame
+import os
+
 class Tower:
     def __init__(self, name: str, damage: int, shot_cooldown: int, price: int, attack_range: int, attack_pattern: int):
         self._name = name
@@ -11,6 +14,22 @@ class Tower:
         self._upgrade_level = 1
         self._upgrade_cost = price + (price * 0.5)
         self._enemies_defeated = 0
+        self._image = pygame.image.load(os.path.join('game_assests', "tower.png"))
+        self.size = 28
+
+    def render(self, window):
+        if self._position:
+            adjusted_x = (self._position[0] - (self.size * 2) // 2 + (self.size // 2) - 7)
+            adjusted_y = (self._position[1] - (self.size * 2) // 2 + (self.size // 2) - 12)
+            tower_surface = pygame.transform.scale(
+                self._image,
+                (self.size * 3, self.size * 3)
+            )
+            window.blit(tower_surface, (adjusted_x, adjusted_y))
+
+            
+    def place(self, position):
+        self._position = position
 
     def get_name(self):
         return self._name
@@ -50,9 +69,6 @@ class Tower:
 
     def get_enemies_defeated(self):
         return self._enemies_defeated
-
-    def place_tower(self, position: int):
-        self._position = position
 
     def upgrade_tower(self):
         self._upgrade_level += 1
