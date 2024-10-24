@@ -58,6 +58,10 @@ class MainGameScreen:
         self.wave_text = self.font.render(f'Wave: {self.wave}', True, (255, 255, 255))
         pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha() # not working because file isn't suppourted
         self.pause_button = button.Button(710, 510, pause_img, 0.15 )
+
+        self.pause = True
+
+ 
         self.grid_active = False
         self.grid_size = 14
         self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322), (444, 226), (700, 226))
@@ -68,6 +72,7 @@ class MainGameScreen:
         #Debugging Variables
         self.debug = False
         self.cursor_text = self.font.render('', True, (255, 255, 255)) 
+
 
     def render(self):
         self.window.blit(self.background, (0, 0))
@@ -88,8 +93,10 @@ class MainGameScreen:
         side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150,150,150))
         bottom_bar.draw()
         side_bar.draw()
-        self.pause_button.draw(window)
 
+        self.pause_button.draw(window) # checks if the pause button is clicked
+
+       
         tower_boxes = [
         Rectangle(705, 100, 90, 90, (100, 100, 100)),
         Rectangle(705, 200, 90, 90, (100, 100, 100)),
@@ -124,20 +131,6 @@ class MainGameScreen:
                 print(tower._position) 
             '''
 
-        """
-        # potential code for pause button hitbox
-        top_pause_box_width = 50
-        top_pause_box_height = 5
-        top_pause_box_x = 725
-        top_pause_box_y = 525
-        pygame.draw.rect(self.window, (0, 0, 0), (top_pause_box_x, top_pause_box_y, top_pause_box_width, top_pause_box_height))
-
-        side_pause_box_width = 5
-        side_pause_box_height = 50
-        side_pause_box_x = 7
-        side_pause_box_y = 500
-        pygame.draw.rect(self.window, (0, 0, 0), (side_pause_box_x, side_pause_box_y, side_pause_box_width, side_pause_box_height))
-        """
 
         pygame.display.update()
     
@@ -196,9 +189,15 @@ class MainGameScreen:
                     if box.collidepoint(mouse_pos):
                         self.grid_active = not self.grid_active
                         return
-
                 if self.grid_active:
                     self.place_tower(mouse_pos)
+                    
+                pause_button = pygame.Rect(710, 510, 75, 75)
+                if pause_button.collidepoint(mouse_pos):
+                    if self.pause == True:
+                        self.pause = False
+                    elif self.pause == False:
+                        self.pause = True
                     
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
@@ -304,6 +303,12 @@ def main():
         elif game_state == 'main_game':
             main_game_screen.render()
             main_game_screen.check_for_click()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            
         fpsClock.tick(FPS)
 
 if __name__ == '__main__':
