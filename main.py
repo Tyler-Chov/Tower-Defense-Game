@@ -92,16 +92,9 @@ class MainGameScreen:
         bottom_bar.draw()
         side_bar.draw()
 
-        if self.pause_button.draw(window): # checks if the pause button is clicked
-            print("button hit")
-            if self.pause == True:
-                self.pause = False
-            elif self.pause == False:
-                self.pause = True
-            print(self.pause)
-       
-        self.pause_button.draw(window)
+        self.pause_button.draw(window) # checks if the pause button is clicked
 
+       
         tower_boxes = [
         Rectangle(705, 100, 90, 90, (100, 100, 100)),
         Rectangle(705, 200, 90, 90, (100, 100, 100)),
@@ -152,6 +145,12 @@ class MainGameScreen:
                     if box.collidepoint(mouse_pos):
                         self.grid_active = not self.grid_active 
                         return
+                pause_button = pygame.Rect(710, 510, 75, 75)
+                if pause_button.collidepoint(mouse_pos):
+                    if self.pause == True:
+                        self.pause = False
+                    elif self.pause == False:
+                        self.pause = True
                     
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
