@@ -91,7 +91,6 @@ class MainGameScreen:
         side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150,150,150))
         bottom_bar.draw()
         side_bar.draw()
-        player_stats
 
         if self.pause_button.draw(window): # checks if the pause button is clicked
             print("button hit")
