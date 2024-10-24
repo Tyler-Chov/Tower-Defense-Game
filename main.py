@@ -59,6 +59,10 @@ class MainGameScreen:
         self.wave_text = self.font.render(f'Wave: {self.wave}', True, (255, 255, 255))
         pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha() # not working because file isn't suppourted
         self.pause_button = button.Button(710, 510, pause_img, 0.15 )
+
+        self.pause = True
+
+ 
         self.grid_active = False
         self.grid_size = 14
         self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322), (444, 226), (700, 226))
@@ -66,6 +70,7 @@ class MainGameScreen:
         #Debugging Variables
         self.debug = False
         self.cursor_text = self.font.render('', True, (255, 255, 255)) 
+
 
     def render(self):
         self.window.blit(self.background, (0, 0))
@@ -86,6 +91,16 @@ class MainGameScreen:
         side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150,150,150))
         bottom_bar.draw()
         side_bar.draw()
+        player_stats
+
+        if self.pause_button.draw(window): # checks if the pause button is clicked
+            print("button hit")
+            if self.pause == True:
+                self.pause = False
+            elif self.pause == False:
+                self.pause = True
+            print(self.pause)
+       
         self.pause_button.draw(window)
 
         tower_boxes = [
@@ -108,6 +123,7 @@ class MainGameScreen:
         if self.debug:
             self.update_cursor_position()
             self.draw_enemy_path()
+
 
         pygame.display.update()
     
@@ -198,6 +214,12 @@ def main():
         elif game_state == 'main_game':
             main_game_screen.render()
             main_game_screen.check_for_click()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            
         fpsClock.tick(FPS)
 
 if __name__ == '__main__':
