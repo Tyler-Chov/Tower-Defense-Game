@@ -109,21 +109,6 @@ class MainGameScreen:
             self.update_cursor_position()
             self.draw_enemy_path()
 
-        """
-        # potential code for pause button hitbox
-        top_pause_box_width = 50
-        top_pause_box_height = 5
-        top_pause_box_x = 725
-        top_pause_box_y = 525
-        pygame.draw.rect(self.window, (0, 0, 0), (top_pause_box_x, top_pause_box_y, top_pause_box_width, top_pause_box_height))
-
-        side_pause_box_width = 5
-        side_pause_box_height = 50
-        side_pause_box_x = 7
-        side_pause_box_y = 500
-        pygame.draw.rect(self.window, (0, 0, 0), (side_pause_box_x, side_pause_box_y, side_pause_box_width, side_pause_box_height))
-        """
-
         pygame.display.update()
     
     def draw_grid(self):
