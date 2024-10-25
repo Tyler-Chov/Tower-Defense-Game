@@ -96,6 +96,9 @@ class MainGameScreen:
 
         self.pause_button.draw(window) # checks if the pause button is clicked
 
+        if self.pause == False:
+            pass # call waves/enemys
+
        
         tower_boxes = [
         Rectangle(705, 100, 90, 90, (100, 100, 100)),
@@ -303,6 +306,7 @@ def main():
         elif game_state == 'main_game':
             main_game_screen.render()
             main_game_screen.check_for_click()
+            
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
