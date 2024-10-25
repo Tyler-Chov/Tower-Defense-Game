@@ -1,3 +1,8 @@
+import pygame
+import os
+import math
+
+
 class Tower:
     def __init__(self, name: str, damage: int, shot_cooldown: int, price: int, attack_range: int, attack_pattern: int):
         self._name = name
@@ -11,6 +16,21 @@ class Tower:
         self._upgrade_level = 1
         self._upgrade_cost = price + (price * 0.5)
         self._enemies_defeated = 0
+        self._image = pygame.image.load(os.path.join('game_assests', "tower.png"))
+        self.size = 28
+
+    def render(self, window):
+        if self._position:
+            adjusted_x = (self._position[0] - (self.size * 2) // 2 + (self.size // 2) - 7)
+            adjusted_y = (self._position[1] - (self.size * 2) // 2 + (self.size // 2) - 12)
+            tower_surface = pygame.transform.scale(
+                self._image,
+                (self.size * 3, self.size * 3)
+            )
+            window.blit(tower_surface, (adjusted_x, adjusted_y))
+
+    def place(self, position):
+        self._position = position
 
     def get_name(self):
         return self._name
@@ -51,9 +71,6 @@ class Tower:
     def get_enemies_defeated(self):
         return self._enemies_defeated
 
-    def place_tower(self, position: int):
-        self._position = position
-
     def upgrade_tower(self):
         self._upgrade_level += 1
         self._damage += int(self._damage * 0.5)
@@ -63,16 +80,28 @@ class Tower:
     def sell_tower(self):
         print(f"{self._name} tower sold for {self._sell_price} credits.")
 
-    def attack_enemy(self, enemy):
-        if self._shot_cooldown == 0:
-            if self._attack_pattern == 1:
-                pass
-            elif self._attack_pattern == 2:
-                pass
-            self._shot_cooldown = 3
-            self._enemies_defeated += 1
+    def distance_to(self, enemy):
+        tower_x, tower_y = self._position
+        enemy_x, enemy_y = enemy._position
+        return math.sqrt((tower_x - enemy_x) ** 2 + (tower_y - enemy_y) ** 2)
+
+    def attack_enemy(self, enemies, base):
+        if self._cooldown_timer == 0:
+            enemies_in_range = [enemy for enemy in enemies if
+                                enemy.is_alive() and self.distance_to(enemy) <= self._attack_range]
+            if enemies_in_range:
+                if self._attack_pattern == 1:
+                    target_enemy = min(enemies_in_range, key=self.distance_to)
+                elif self._attack_pattern == 2:
+                    target_enemy = enemies_in_range[0]
+                else:
+                    target_enemy = min(enemies_in_range, key=self.distance_to)
+
+                target_enemy.take_damage(self._damage, base)
+                self._enemies_defeated += 1 if not target_enemy.is_alive() else 0
+                self._cooldown_timer = self._shot_cooldown
         else:
-            self._shot_cooldown -= 1
+            self._cooldown_timer -= 1
 
     def get_stats(self):
         return {
@@ -84,6 +113,7 @@ class Tower:
             "Sell Tower": self._sell_price,
             "Upgrade Cost": self._upgrade_cost
         }
+
 
 tower = Tower("Archer Tower", 50, 3, 100, 5, 1)
 print(tower.get_stats())
