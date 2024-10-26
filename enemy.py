@@ -1,41 +1,35 @@
+import pygame.draw
+
+
 class Enemy:
-    def __init__(self, health, speed, strength, path):
+    def __init__(self, e_type, health, speed, strength, path):
+        self._type = e_type
         self._health = health
         self._speed = speed
         self._strength = strength
         self._path = path
         self._position = self._path[0]
         self._path_index = 0
-        self._status = True
+        self._status = True  # Means the enemy is alive
         self._resource_worth = health * 3
 
     def _move(self):
         if self._path_index < len(self._path) - 1:
-            _current_x, _current_y = self._position
-            _next_x, _next_y = self._path[self._path_index + 1]
-            # Calculate direction to the next point
-            _direction_x = _next_x - _current_x
-            _direction_y = _next_y - _current_y
-            # Normalize direction and scale by speed
-            _distance = (_direction_x ** 2 + _direction_y ** 2) ** 0.5
-            if _distance != 0:
-                _direction_x /= _distance
-                _direction_y /= _distance
-            # Move the enemy by speed units in the direction of the next point
-            _new_x = _current_x + _direction_x * self._speed
-            _new_y = _current_y + _direction_y * self._speed
-            # Update position
-            self._position = (_new_x, _new_y)
-            # Check if the enemy has reached the next point
-            if _distance <= self._speed:
-                self._path_index += 1  # Move to the next point on the path
-        else:
-            # Reached the end of the path
-            self.damage_base(self._strength)
+            target_x, target_y = self._path[self._path_index]
+            dir_x, dir_y = target_x - self._position[0], target_y - self._position[1]
+            distance = (dir_x ** 2 + dir_y ** 2) ** 0.5
+            if distance < self._speed:
+                self.position = (target_x, target_y)
+                self._path_index += 1  # Move to the next point
+            else:
+                self.position = (
+                    self.position[0] + dir_x / distance * self._speed,
+                    self.position[1] + dir_y / distance * self._speed,
+                )
 
     def take_damage(self, damage, player):
         self._health = self._health - damage
-        if self._health <= 0:
+        if self.get_enemy_health() <= 0:
             self.kill_enemy(player)
 
     def kill_enemy(self, base):
@@ -46,15 +40,24 @@ class Enemy:
         base.add_money(self._resource_worth)
 
     def damage_base(self, base):
-        base.remove_health(self._strength)
+        base.remove_health(self.get_enemy_strength())
         self._status = False
 
     def is_alive(self):
         return self._status
 
+    def get_enemy_type(self):
+        return self._type
 
-path = ()  # placeholder for path, will be pulled from main class
-_circle = Enemy(1, 2, 1, path)
-_square = Enemy(3, 1, 2, path)
-_triangle = Enemy(2, 4, 1, path)
+    def get_enemy_health(self):
+        return self._health
 
+    def get_enemy_speed(self):
+        return self._speed
+
+    def get_enemy_strength(self):
+        return self._strength
+
+    def render(self, window):
+        pygame.draw.circle(window, (255, 0, 0),
+                           (int(self._position[0]), int(self._position[1])), 10)

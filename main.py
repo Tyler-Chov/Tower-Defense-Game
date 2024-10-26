@@ -1,5 +1,7 @@
 import pygame, sys, os, button
 from tower import Tower
+from enemy import Enemy
+from waves import Wave
 FPS = 60
 fpsClock = pygame.time.Clock()
 window_width = 800
@@ -54,8 +56,6 @@ class MainGameScreen:
         self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
         self.money = 0 
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
-        self.wave = 0 
-        self.wave_text = self.font.render(f'Wave: {self.wave}', True, (255, 255, 255))
         pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha() # not working because file isn't suppourted
         self.pause_button = button.Button(710, 510, pause_img, 0.15 )
 
@@ -68,6 +68,17 @@ class MainGameScreen:
         self.tower_size = 3
         self.selected_tower = None
         self.placed_towers = []
+
+        # Wave and Enemy
+        self.wave = 1
+        self._waves = []  # list of waves
+        self._time_since_previous_spawn = 0
+        self._enemy_list = []
+        self._current_wave = 0
+        self.wave_text = self.font.render(f'Wave: {self.wave}', True, (255, 255, 255))
+
+        wave_1_data = [{'e_type': 'circle', 'health': 15, 'speed': 1, 'strength': 1, 'path': self.map_path}]
+        self._waves.append(Wave(wave_1_data, 2))
 
         #Debugging Variables
         self.debug = False
@@ -97,8 +108,7 @@ class MainGameScreen:
         self.pause_button.draw(window) # checks if the pause button is clicked
 
         if self.pause == False:
-            pass # call waves/enemys
-
+            pass # call waves/enemies
        
         tower_boxes = [
         Rectangle(705, 100, 90, 90, (100, 100, 100)),
@@ -134,6 +144,17 @@ class MainGameScreen:
                 print(tower._position) 
             '''
 
+        self.update_waves()
+
+        for enemy in self._enemy_list:
+            if enemy.is_alive():
+                enemy._move()
+                enemy.render(self.window)
+                if enemy._path_index >= len(enemy._path) - 1:
+                    enemy.damage_base(self)
+                    self.remove_health(enemy._strength)
+        for enemy in self._enemy_list:
+            enemy.render(self.window)
 
         pygame.display.update()
     
@@ -289,6 +310,24 @@ class MainGameScreen:
             end_pos = self.map_path[i + 1]
             pygame.draw.line(self.window, path_color, start_pos, end_pos, path_width)
 
+    def update_waves(self):
+        if self._current_wave < len(self._waves):
+            current_wave = self._waves[self._current_wave]
+            if current_wave._is_wave_complete():
+                self._current_wave += 1
+                if self._current_wave < len(self._waves):
+                    self.wave += 1
+                    self.wave_text = self.font.render(f"Wave: {self.wave}", True, (255, 255, 255))
+                return
+
+            self._time_since_previous_spawn += 1
+            if self._time_since_previous_spawn >= current_wave._spawn_timer:
+                if current_wave.spawn_enemy():
+                    new_enemy = current_wave._enemy_list[-1]
+                    self._enemy_list.append(new_enemy)
+                self._time_since_previous_spawn = 0
+
+            self._enemy_list = [e for e in self._enemy_list if e.is_alive()]
 
 def main():
     start_screen = StartScreen(window)
@@ -296,6 +335,7 @@ def main():
     game_state = 'start_screen'
     main_game_screen.set_health(100)
     main_game_screen.set_money(500)
+
 
     while True:
         if game_state == 'start_screen':
@@ -314,6 +354,8 @@ def main():
                     sys.exit()
             
         fpsClock.tick(FPS)
+
+
 
 if __name__ == '__main__':
     main()
