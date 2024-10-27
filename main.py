@@ -118,15 +118,9 @@ class MainGameScreen:
             def draw(self):
                 pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
 
-        # create and draw menus
+        # create menus, tower slots, and tower image
         bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150,150,150))
         side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150,150,150))
-        bottom_bar.draw()
-        side_bar.draw()
-        self.pause_button.draw(window) # checks if the pause button is clicked
-        if self.pause == False:
-            pass # call waves/enemies
-       
         tower_boxes = [
         Rectangle(705, 100, 90, 90, (100, 100, 100)),
         Rectangle(705, 200, 90, 90, (100, 100, 100)),
@@ -135,9 +129,6 @@ class MainGameScreen:
         ]
         tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
         tower_image = pygame.transform.scale(tower_image, (90, 90))
-        for box in tower_boxes:
-            box.draw()
-        self.window.blit(tower_image, (705, 95))
         
         if self.grid_active:
             self.render_tower_preview()
@@ -147,10 +138,6 @@ class MainGameScreen:
             #Logic for upgrades and tower selection info should go here
 
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
-        self.window.blit(self.health_text, (705, 10))
-        self.window.blit(self.money_text, (705, 40))
-        self.window.blit(self.wave_text, (705, 70))
-        self.window.blit(self.tower1_price, (731, 167))
         
         for tower in self.placed_towers:
             tower.render(self.window)
@@ -176,9 +163,21 @@ class MainGameScreen:
                     self.remove_money(enemy._resource_worth)
                 enemy.render(self.window)
         self.update_attacks()
+
+        # Display menu and UI
+        bottom_bar.draw()
+        side_bar.draw()
+        for box in tower_boxes:
+            box.draw()
+        self.window.blit(tower_image, (705, 95))
+        self.window.blit(self.health_text, (705, 10))
+        self.window.blit(self.money_text, (705, 40))
+        self.window.blit(self.wave_text, (705, 70))
+        self.window.blit(self.tower1_price, (731, 167))
+        self.pause_button.draw(window) 
         pygame.display.update()
 
-    def check_for_click(self):
+    def check_for_click(self): 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
