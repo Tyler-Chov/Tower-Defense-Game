@@ -5,6 +5,7 @@ class Enemy:
     def __init__(self, e_type, health, speed, strength, path):
         self._type = e_type
         self._health = health
+        self._max_health = health
         self._speed = speed
         self._strength = strength
         self._path = path
@@ -27,14 +28,13 @@ class Enemy:
                     self._position[1] + dir_y / distance * self._speed,
                 )
 
-    def take_damage(self, damage, player):
+    def take_damage(self, damage):
         self._health = self._health - damage
         if self.get_enemy_health() <= 0:
-            self.kill_enemy(player)
+            self.kill_enemy()
 
-    def kill_enemy(self, base):
+    def kill_enemy(self):
         self._status = False
-        self.reward_resources(base)
 
     def reward_resources(self, base):
         base.add_money(self._resource_worth)
@@ -61,3 +61,10 @@ class Enemy:
     def render(self, window):
         pygame.draw.circle(window, (255, 0, 0),
                            (int(self._position[0]), int(self._position[1])), 10)
+        self._draw_health_bar(window)
+
+    def _draw_health_bar(self, window):
+        health_ratio = self._health / self._max_health
+        green = int(255 * health_ratio)
+        red = 255 - green
+        pygame.draw.rect(window, (red, green, 0), (self._position[0] - 15, self._position[1] - 20, 30 * health_ratio, 5))
