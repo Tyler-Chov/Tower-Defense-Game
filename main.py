@@ -173,6 +173,7 @@ class MainGameScreen:
                 if enemy._path_index >= len(enemy._path) - 1:
                     enemy.damage_base(self)
                     self.remove_health(enemy._strength)
+                    self.remove_money(enemy._resource_worth)
                 enemy.render(self.window)
         self.update_attacks()
         pygame.display.update()
