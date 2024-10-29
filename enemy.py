@@ -40,16 +40,15 @@ class Enemy:
                     self._position[1] + dir_y / distance * self._speed,
                 )
 
-    def take_damage(self, damage, player):
+    def take_damage(self, damage):
         """Takes damage and calls kill_enemy if health hits zero"""
         self._health = self._health - damage
         if self.get_enemy_health() <= 0:
-            self.kill_enemy(player)
+            self.kill_enemy()
 
-    def kill_enemy(self, base):
+    def kill_enemy(self):
         """Kills the enemy and calls reward_resources"""
         self._status = False
-        self.reward_resources(base)
 
     def reward_resources(self, base):
         """Gives player resources based on how much the enemy is worth"""
