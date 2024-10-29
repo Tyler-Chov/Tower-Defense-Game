@@ -17,11 +17,6 @@ Attributes:
     - position (tuple): Position of the tower on the screen.
     - upgrade_level (int): Current level of the tower.
     - enemies_defeated (int): Count of enemies defeated by this tower.
-
-Example usage:
-    archer_tower = Tower("Archer Tower", 50, 3, 100, 5, 1)
-    archer_tower.place((150, 150))
-    archer_tower.render(window)
 """
 
 
