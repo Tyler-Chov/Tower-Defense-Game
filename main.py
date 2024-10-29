@@ -53,12 +53,13 @@ class MainGameScreen:
         self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
         self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         self.font = pygame.font.SysFont(None, 24)
-        self.health = 0 
+        self.health = 0
         self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
-        self.money = 0 
+        self.money = 0
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
-        pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha() # not working because file isn't suppourted
+        # Pause button
+        pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         self.pause_button = button.Button(710, 510, pause_img, 0.15 )
         self.pause = True
 
@@ -214,7 +215,7 @@ class MainGameScreen:
                 if not tower_clicked:
                     self.selected_tower = None
 
-                #Pause button functionality                    
+                # Pause button functionality
                 pause_button = pygame.Rect(710, 510, 75, 75)
                 if pause_button.collidepoint(mouse_pos):
                     if self.pause == True:
@@ -352,14 +353,14 @@ class MainGameScreen:
     def set_money(self, money):
         self.money = money
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
-    
+   
     # Debugging Functions
     def update_cursor_position(self):
         """Update and render the cursor position."""
         mouse_pos = pygame.mouse.get_pos()  
         self.cursor_text = self.font.render(f'Cursor: {mouse_pos}', True, (255, 255, 255))
         self.window.blit(self.cursor_text, (10, 10)) 
-    
+  
     def draw_enemy_path(self):
         path_color = (255, 0, 0)
         path_width = 3
