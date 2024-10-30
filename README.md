@@ -1,2 +1,2 @@
 # Tower-Defense-Game
-Tower Defense Game FOR CIS 350 (hopefully)
+Work in Progress Tower Defense Game FOR CIS 350 
