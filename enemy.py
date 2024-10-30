@@ -83,6 +83,7 @@ class Enemy:
         """Renders the enemy, currently as a circle. Plan to render as different shapes based on enemy type"""
         pygame.draw.circle(window, (255, 0, 0),
                            (int(self._position[0]), int(self._position[1])), 10)
+        self._draw_health_bar(window)
 
     def _draw_health_bar(self, window):
         """Creates a visual for the player to know the status of the enemy's health"""

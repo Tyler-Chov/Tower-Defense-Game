@@ -14,7 +14,28 @@ window = pygame.display.set_mode((window_width, window_height))
 
 
 class StartScreen:
+    """
+    A class to represent the start screen of the Tower Defense Game.
+    Attributes:
+    
+    Attributes:
+    window: The window surface where the start screen will be rendered.
+    background: The background image of the start screen.
+    font: The font used for rendering text on the start screen.
+    title_text: The rendered text surface for the game title.
+    start_text: The rendered text surface for the start button.
+    start_button_rect: The rectangle area of the start button.
+   
+    Methods:
+    render(): Renders the start screen with the background, title, and start button.
+    check_for_click(): Checks for mouse click events and returns True if the start button is clicked.
+    """
     def __init__(self, window):
+        """
+        Initializes the main game window and loads the start screen assets.
+        Args:
+            window: The window surface where the start screen will be rendered.
+        """
         self.window = window
         self.background = pygame.image.load(os.path.join('game_assests', 'start_screen_background.jpg'))
         self.background = pygame.transform.scale(self.background, (window_width, window_height))
@@ -23,6 +44,9 @@ class StartScreen:
         self.start_text = self.font.render('Click to Start', True, (255, 255, 255))
 
     def render(self):
+        """
+        Renders the start screen with the background, title, and start button.
+        """
         self.window.blit(self.background, (0, 0))
         self.window.blit(self.title_text, (window_width // 2 - self.title_text.get_width() // 2, 100))
         start_text_rect = self.start_text.get_rect(center=(window_width // 2, 400))
@@ -37,6 +61,12 @@ class StartScreen:
         self.start_button_rect = pygame.Rect(rect_x, rect_y, rect_width, rect_height)
 
     def check_for_click(self):
+        """
+        Checks for mouse click events and returns True if the start button is clicked.
+
+        Returns:
+            bool: True if the start button is clicked, False otherwise.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -57,7 +87,7 @@ class MainGameScreen:
         """Loads the image."""
         self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         """Scales the image in self.background appropriately and then saves it back to self.background."""
-        self.font = pygame.font.SysFont(None, 24)
+        self.font = pygame.font.SysFont(None, 22)
         """Sets the font style to be used."""
         self.health = 0
         """Holds the amount of health the player has remaining."""
@@ -186,6 +216,9 @@ class MainGameScreen:
         for tower in self.placed_towers:
             """Renders each placed tower."""
             tower.render(self.window)
+        
+        for enemy in self._enemy_list:
+            enemy.render(self.window)
 
         if self.debug:
             """When debug is true, updates the game and renders various aspects."""
@@ -197,19 +230,18 @@ class MainGameScreen:
             for tower in self.placed_towers:
                 print(tower._position) 
             '''
-
-        self.update_waves()
-        for enemy in self._enemy_list:
-            """For each active enemy, the enemy will move along the set path towards the player base."""
-            if enemy.is_alive():
-                enemy._move()
-                enemy.render(self.window)
-                if enemy._path_index >= len(enemy._path) - 1:
-                    enemy.damage_base(self)
-                    self.remove_health(enemy._strength)
-                    self.remove_money(enemy._resource_worth)
-                enemy.render(self.window)
-        self.update_attacks()
+        if not self.pause:
+            
+            self.update_waves()
+            for enemy in self._enemy_list:
+                """For each active enemy, the enemy will move along the set path towards the player base."""
+                if enemy.is_alive():
+                    enemy._move()
+                    if enemy._path_index >= len(enemy._path) - 1:
+                        enemy.damage_base(self)
+                        self.remove_health(enemy._strength)
+                        self.remove_money(enemy._resource_worth)
+            self.update_attacks()
 
         # Display menu and UI
         bottom_bar.draw()
