@@ -77,15 +77,44 @@ class StartScreen:
                     return True
         return False
 
-
-class MainGameScreen:
-    """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
+class Stage_Select_Screen:
     def __init__(self, window):
         self.window = window
+        self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select.png'))
+        self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        self.font = pygame.font.SysFont(None, 55)
+        self.selection = None
+    def render(self, window):
+        self.window.blit(self.background, (0, 0))
+
+        pygame.display.update()
+        self.stage1_button_rect = pygame.Rect(60, 300, 196, 196)
+        self.stage2_button_rect = pygame.Rect(540, 300, 196, 196)
+    
+    def check_for_click(self, window):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if self.stage1_button_rect.collidepoint(mouse_pos):
+                    self.selection = 1
+                    return True
+                if self.stage2_button_rect.collidepoint(mouse_pos):
+                    self.selection = 2
+                    return True
+                
+        return False
+    
+    def return_selection(self):
+        return self.selection
+    
+class MainGameScreen:
+    """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
+    def __init__(self, window, map):
+        self.window = window
         """The window for the game."""
-        self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
-        """Loads the image."""
-        self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         """Scales the image in self.background appropriately and then saves it back to self.background."""
         self.font = pygame.font.SysFont(None, 22)
         """Sets the font style to be used."""
@@ -105,21 +134,27 @@ class MainGameScreen:
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
         self.pause = True
         """Sets pause to True when initially ran."""
-
+        self.map = map
         # Map Variables
-        self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322),
-                         (444, 226), (700, 226), (800, 226))
-        """Sets the path for enemies to traverse."""
-        self.collision_rects = [
-            pygame.Rect(min(0, 140), min(248, 300), max(0, 140) - min(0, 140), max(248, 300) - min(248, 300)),
-            pygame.Rect(min(140, 96), min(300, 100), max(140, 96) - min(140, 96), max(300, 100) - min(300, 100)),
-            pygame.Rect(min(96, 278), min(100, 146), max(96, 278) - min(96, 278), max(146, 100) - min(100, 146)),
-            pygame.Rect(min(278, 230), min(146, 348), max(278, 230) - min(278, 230), max(348, 146) - min(146, 348)),
-            pygame.Rect(min(230, 470), min(348, 299), max(470, 230) - min(230, 470), max(348, 299) - min(299, 348)),
-            pygame.Rect(min(470, 418), min(299, 200), max(470, 418) - min(470, 418), max(299, 200) - min(200, 299)),
-            pygame.Rect(min(418, 700), min(200, 250), max(700, 418) - min(418, 700), max(250, 200) - min(200, 250)),
-        ]
-        """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
+        if self.map == 1:
+            self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
+            """Loads the image."""
+            self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
+            self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322),
+                            (444, 226), (700, 226), (800, 226))
+            """Sets the path for enemies to traverse."""
+            self.collision_rects = [
+                pygame.Rect(min(0, 140), min(248, 300), max(0, 140) - min(0, 140), max(248, 300) - min(248, 300)),
+                pygame.Rect(min(140, 96), min(300, 100), max(140, 96) - min(140, 96), max(300, 100) - min(300, 100)),
+                pygame.Rect(min(96, 278), min(100, 146), max(96, 278) - min(96, 278), max(146, 100) - min(100, 146)),
+                pygame.Rect(min(278, 230), min(146, 348), max(278, 230) - min(278, 230), max(348, 146) - min(146, 348)),
+                pygame.Rect(min(230, 470), min(348, 299), max(470, 230) - min(230, 470), max(348, 299) - min(299, 348)),
+                pygame.Rect(min(470, 418), min(299, 200), max(470, 418) - min(470, 418), max(299, 200) - min(200, 299)),
+                pygame.Rect(min(418, 700), min(200, 250), max(700, 418) - min(418, 700), max(250, 200) - min(200, 250)),
+            ]
+            """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
+        elif map == 2:
+            pass
 
         # Tower Variables
         self.grid_active = False
@@ -149,8 +184,10 @@ class MainGameScreen:
             """Determines amount of enemies to be spawned, dependent on wave number."""
             enemy_hp = 10 + (5 * wave_number)
             """Increases health of the enemies, dependent on wave number."""
+            speed = 1 + (0.2 * wave_number)
+            """Increases speed of the enemies, dependent on wave number."""
             wave_data = [
-                Enemy('circle', enemy_hp, 1, 1, self.map_path) for i in range(enemy_count)
+                Enemy('circle', enemy_hp, speed, 1, self.map_path) for i in range(enemy_count)
             ]
             """Generate wave data, to be added to self._waves"""
             self._waves.append(Wave(wave_data, 60))
@@ -348,8 +385,8 @@ class MainGameScreen:
             self.selected_tower = False
             self.remove_money(200)
         else:
-            print("Cannot place the tower here. Collision detected.")
-
+            #print("Cannot place the tower here. Collision detected.")
+            pass
     def check_collision(self, x, y):
         preview_size = self.grid_size * self.tower_size
 
@@ -450,16 +487,23 @@ class MainGameScreen:
 
 def main():
     start_screen = StartScreen(window)
-    main_game_screen = MainGameScreen(window)
+    stage_select = Stage_Select_Screen(window)
     game_state = 'start_screen'
-    main_game_screen.set_health(100)
-    main_game_screen.set_money(500)
     while True:
         if game_state == 'start_screen':
             start_screen.render()
             if start_screen.check_for_click():
+                game_state = 'stage_select'
+        
+        elif game_state == 'stage_select':
+            stage_select.render(window)
+            if stage_select.check_for_click(window):
+                map = stage_select.return_selection()
                 game_state = 'main_game'
-
+                main_game_screen = MainGameScreen(window, map)
+                main_game_screen.set_health(100)
+                main_game_screen.set_money(500)
+        
         elif game_state == 'main_game':
             main_game_screen.render()
             main_game_screen.check_for_click()
