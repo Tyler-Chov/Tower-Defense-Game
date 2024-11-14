@@ -127,14 +127,20 @@ class MainGameScreen:
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
         """Renders the money text so the player knows how much money they have remaining."""
 
-        # Pause button
-        pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
+        # Wave Pause button
+        wave_pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         """The image of the pause button."""
-        self.pause_button = button.Button(710, 510, pause_img, 0.15)
+        self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
-        self.pause = True
+
+        self.game_pause_img = pygame.image.load(os.path.join('game_assests', 'pause.png'))
+        self.game_pause_img = pygame.transform.scale(self.game_pause_img, (30, 30))
+        self.wave_pause = False
+        self.pause = False
         """Sets pause to True when initially ran."""
         self.map = map
+        self.return_to_stage_select = False
+
         # Map Variables
         if self.map == 1:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
@@ -220,6 +226,7 @@ class MainGameScreen:
             def draw(self):
                 """Draws the rectangle."""
                 pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
+        """Creates a rectangle for the pause button."""
 
         # create menus, tower slots, and tower image
         bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150, 150, 150))
@@ -267,7 +274,7 @@ class MainGameScreen:
             for tower in self.placed_towers:
                 print(tower._position) 
             '''
-        if not self.pause:
+        if not self.wave_pause:
             
             self.update_waves()
             for enemy in self._enemy_list:
@@ -286,12 +293,14 @@ class MainGameScreen:
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
+
         self.window.blit(tower_image, (705, 95))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
-        self.pause_button.draw(window)
+        self.wave_pause_button.draw(window)
+        self.window.blit(self.game_pause_img, (10, 10))
         pygame.display.update()
 
     def check_for_click(self):
@@ -331,13 +340,29 @@ class MainGameScreen:
                 if not tower_clicked:
                     self.selected_tower = None
 
-                # Pause button functionality
-                pause_button = pygame.Rect(710, 510, 75, 75)
-                if pause_button.collidepoint(mouse_pos):
-                    if self.pause == True:
+                # Wave Pause button functionality
+                wave_pause_button = pygame.Rect(710, 510, 75, 75)
+                if wave_pause_button.collidepoint(mouse_pos):
+                    if self.wave_pause == True:
+                        self.wave_pause = False
+                    elif self.wave_pause == False:
+                        self.wave_pause = True
+                    return
+                 
+                # Game Pause button functionality
+                game_pause_button = pygame.Rect(10, 10, 30, 30)
+                if game_pause_button.collidepoint(mouse_pos):
+                    self.pause = True
+                    self.wave_pause = True
+                    result = self.pause_screen()
+                    if result == "resume":
+                        self.wave_pause = False
                         self.pause = False
-                    elif self.pause == False:
-                        self.pause = True
+                        return
+                    elif result == "stage_select":
+                        self.return_to_stage_select = True
+                        return "stage_select"
+                    return
 
             # Debug toggle button.
             elif event.type == pygame.KEYDOWN:
@@ -440,6 +465,59 @@ class MainGameScreen:
                     """Records the next enemy to be spawned."""
                     self._enemy_list.append(new_enemy)
                 self._time_since_previous_spawn = 0
+    
+    def pause_screen(self):
+        if self.return_to_stage_select:
+            return "stage_select"  
+        
+        overlay = pygame.Surface((window_width, window_height))
+        overlay.fill((0, 0, 0))
+        overlay.set_alpha(128)
+        self.window.blit(overlay, (0, 0))
+
+        font = pygame.font.SysFont(None, 30)
+        pause_font = pygame.font.SysFont(None, 80)
+        pause_text = pause_font.render("Paused", True, (255, 255, 255))
+        self.window.blit(pause_text, (window_width // 2 - pause_text.get_width() // 2, 100))
+
+        button_width, button_height = 200, 50
+        resume_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 220, button_width, button_height)
+        stage_select_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 290, button_width, button_height)
+        quit_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 360, button_width, button_height)
+
+        pygame.draw.rect(self.window, (150, 150, 150), resume_button_rect)
+        pygame.draw.rect(self.window, (150, 150, 150), stage_select_button_rect)
+        pygame.draw.rect(self.window, (150, 150, 150), quit_button_rect)
+
+        resume_text = font.render("Resume", True, (255, 255, 255))
+        stage_select_text = font.render("Stage Select", True, (255, 255, 255))
+        quit_text = font.render("Quit", True, (255, 255, 255))
+
+        self.window.blit(resume_text, (resume_button_rect.centerx - resume_text.get_width() // 2, resume_button_rect.centery - resume_text.get_height() // 2))
+        self.window.blit(stage_select_text, (stage_select_button_rect.centerx - stage_select_text.get_width() // 2, stage_select_button_rect.centery - stage_select_text.get_height() // 2))
+        self.window.blit(quit_text, (quit_button_rect.centerx - quit_text.get_width() // 2, quit_button_rect.centery - quit_text.get_height() // 2))
+
+        pygame.display.flip()
+        
+        paused = True
+        while paused:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if resume_button_rect.collidepoint(mouse_pos):
+                        paused = False
+                    elif stage_select_button_rect.collidepoint(mouse_pos):
+                        return "stage_select"
+                    elif quit_button_rect.collidepoint(mouse_pos):
+                        pygame.quit()
+                        sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    paused = False
+        return "resume"
+
 
     def remove_health(self, health):
         self.health -= health
@@ -507,6 +585,14 @@ def main():
         elif game_state == 'main_game':
             main_game_screen.render()
             main_game_screen.check_for_click()
+            if main_game_screen.pause:
+                result = main_game_screen.pause_screen()
+                if result == "resume":
+                    main_game_screen.pause = False
+                elif result == "stage_select":
+                    game_state = 'stage_select'
+                    main_game_screen = None
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
