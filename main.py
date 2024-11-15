@@ -196,6 +196,9 @@ class MainGameScreen:
             Rectangle(705, 400, 90, 90, (100, 100, 100))
         ]
         """Makes the rectangles for the tower boxes."""
+
+        health_box = Rectangle(5, 505, 680, 90, (100, 100, 100))
+        health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
         upgrade_boxes = [
             Rectangle(5, 505, 340, 90, (100, 100, 100)),
             Rectangle(355, 505, 340, 90, (100, 100, 100)),
@@ -255,9 +258,11 @@ class MainGameScreen:
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
-        for box in upgrade_boxes:
-            """Draws each box in the upgrade_boxes list."""
-            box.draw()
+        health_box.draw()
+        health_bar.draw()
+        # for box in upgrade_boxes:
+            # """Draws each box in the upgrade_boxes list."""
+            # box.draw()
         self.window.blit(tower_image, (705, 95))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
