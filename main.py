@@ -199,11 +199,18 @@ class MainGameScreen:
 
         health_box = Rectangle(5, 505, 680, 90, (100, 100, 100))
         health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
+        """Makes the rectangles for the health bar/box"""
+       
         upgrade_boxes = [
             Rectangle(5, 505, 340, 90, (100, 100, 100)),
             Rectangle(355, 505, 340, 90, (100, 100, 100)),
         ]
         """Makes the rectangles for the upgrade boxes."""
+
+        upgrade_buttons = [
+            Rectangle(200, 525, 130, 50, (0, 180, 0)),
+            Rectangle(550, 525, 130, 50, (0, 180, 0)),
+        ]
 
         tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
         """Loads tower image."""
@@ -221,6 +228,8 @@ class MainGameScreen:
             # Logic for upgrades and tower selection info should go here
             for box in upgrade_boxes:
                 box.draw()
+            for button in upgrade_buttons:
+                button.draw()
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
             self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
             self.window.blit(self.attack_damage_text, (10, 510))
