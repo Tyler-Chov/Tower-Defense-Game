@@ -214,11 +214,17 @@ class MainGameScreen:
             """Checks if grid is currently active, then renders a preview of the tower selected."""
             self.render_tower_preview()
 
+        bottom_bar.draw()
         if self.selected_tower:
             """Renders the attack radius of the selected tower."""
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
             # Logic for upgrades and tower selection info should go here
+            for box in upgrade_boxes:
+                box.draw()
 
+        else:
+            health_box.draw()
+            health_bar.draw()
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
         """Renders the price of tower1."""
 
@@ -253,13 +259,11 @@ class MainGameScreen:
             self.update_attacks()
 
         # Display menu and UI
-        bottom_bar.draw()
         side_bar.draw()
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
-        health_box.draw()
-        health_bar.draw()
+
         # for box in upgrade_boxes:
             # """Draws each box in the upgrade_boxes list."""
             # box.draw()
