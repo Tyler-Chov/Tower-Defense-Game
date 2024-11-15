@@ -209,35 +209,42 @@ class MainGameScreen:
         self.window.blit(self.background, (0, 0))
         """Sets window"""
 
-        class Rectangle():
+        class Rectangle:
             """Creates rectangles for the UI."""
             def __init__(self, x, y, width, height, color):
                 self.x = x
                 """The x position of the rectangle."""
                 self.y = y
-                """The y position of the rectangle"""
+                """The y position of the rectangle."""
                 self.width = width
                 """The width of the rectangle."""
                 self.height = height
                 """The height of the rectangle."""
                 self.color = color
                 """The color of the rectangle."""
+                self.rect = pygame.Rect(x, y, width, height)
+                """The pygame.Rect object for collision detection."""
 
             def draw(self):
                 """Draws the rectangle."""
-                pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
-        """Creates a rectangle for the pause button."""
+                pygame.draw.rect(window, self.color, self.rect)
+
+            def is_hovered(self, mouse_pos):
+                """Checks if the mouse is hovering over the rectangle."""
+                return self.rect.collidepoint(mouse_pos)
 
         # create menus, tower slots, and tower image
-        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150, 150, 150))
-        """Menu on the bottom, currently hold nothing."""
         side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150, 150, 150))
         """Menu on the right side, shows player stats and towers that can be used."""
+        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150, 150, 150))
+        """Menu on the bottom, currently hold nothing."""
+
+        box_unselected_color = (100, 100, 100)
         tower_boxes = [
-            Rectangle(705, 100, 90, 90, (100, 100, 100)),
-            Rectangle(705, 200, 90, 90, (100, 100, 100)),
-            Rectangle(705, 300, 90, 90, (100, 100, 100)),
-            Rectangle(705, 400, 90, 90, (100, 100, 100))
+            Rectangle(705, 100, 90, 90, box_unselected_color),
+            Rectangle(705, 200, 90, 90, box_unselected_color),
+            Rectangle(705, 300, 90, 90, box_unselected_color),
+            Rectangle(705, 400, 90, 90, box_unselected_color)
         ]
         """Makes the rectangles for the tower boxes."""
         tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
@@ -290,6 +297,12 @@ class MainGameScreen:
         # Display menu and UI
         bottom_bar.draw()
         side_bar.draw()
+        mouse_pos = pygame.mouse.get_pos()
+        for box in tower_boxes:
+            if box.is_hovered(mouse_pos):
+                box.color = (70, 70, 70)
+            else:
+                box.color = box_unselected_color
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
@@ -468,11 +481,11 @@ class MainGameScreen:
     
     def pause_screen(self):
         if self.return_to_stage_select:
-            return "stage_select"  
-        
+            return "stage_select"
+
         overlay = pygame.Surface((window_width, window_height))
         overlay.fill((0, 0, 0))
-        overlay.set_alpha(128)
+        overlay.set_alpha(20)
         self.window.blit(overlay, (0, 0))
 
         font = pygame.font.SysFont(None, 30)
@@ -485,20 +498,10 @@ class MainGameScreen:
         stage_select_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 290, button_width, button_height)
         quit_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 360, button_width, button_height)
 
-        pygame.draw.rect(self.window, (150, 150, 150), resume_button_rect)
-        pygame.draw.rect(self.window, (150, 150, 150), stage_select_button_rect)
-        pygame.draw.rect(self.window, (150, 150, 150), quit_button_rect)
-
         resume_text = font.render("Resume", True, (255, 255, 255))
         stage_select_text = font.render("Stage Select", True, (255, 255, 255))
         quit_text = font.render("Quit", True, (255, 255, 255))
 
-        self.window.blit(resume_text, (resume_button_rect.centerx - resume_text.get_width() // 2, resume_button_rect.centery - resume_text.get_height() // 2))
-        self.window.blit(stage_select_text, (stage_select_button_rect.centerx - stage_select_text.get_width() // 2, stage_select_button_rect.centery - stage_select_text.get_height() // 2))
-        self.window.blit(quit_text, (quit_button_rect.centerx - quit_text.get_width() // 2, quit_button_rect.centery - quit_text.get_height() // 2))
-
-        pygame.display.flip()
-        
         paused = True
         while paused:
             for event in pygame.event.get():
@@ -509,6 +512,7 @@ class MainGameScreen:
                     mouse_pos = pygame.mouse.get_pos()
                     if resume_button_rect.collidepoint(mouse_pos):
                         paused = False
+                        return "resume"
                     elif stage_select_button_rect.collidepoint(mouse_pos):
                         return "stage_select"
                     elif quit_button_rect.collidepoint(mouse_pos):
@@ -516,7 +520,20 @@ class MainGameScreen:
                         sys.exit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     paused = False
-        return "resume"
+            cursor_pos = pygame.mouse.get_pos()
+
+            self.window.fill((30, 30, 30)) 
+            self.window.blit(pause_text, (window_width // 2 - pause_text.get_width() // 2, 100))
+
+            for button_rect, text, color in [
+                (resume_button_rect, resume_text, (100, 100, 100) if resume_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (stage_select_button_rect, stage_select_text, (100, 100, 100) if stage_select_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (quit_button_rect, quit_text, (100, 100, 100) if quit_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+            ]:
+                pygame.draw.rect(self.window, color, button_rect)
+                self.window.blit(text, (button_rect.centerx - text.get_width() // 2, button_rect.centery - text.get_height() // 2))
+            pygame.display.flip()
+
 
 
     def remove_health(self, health):
