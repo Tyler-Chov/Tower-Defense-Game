@@ -221,6 +221,10 @@ class MainGameScreen:
             # Logic for upgrades and tower selection info should go here
             for box in upgrade_boxes:
                 box.draw()
+            self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
+            self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
+            self.window.blit(self.attack_damage_text, (10, 510))
+            self.window.blit(self.attack_cooldown_text, (370, 510))
 
         else:
             health_box.draw()
