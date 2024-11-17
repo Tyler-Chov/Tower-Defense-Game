@@ -232,9 +232,12 @@ class MainGameScreen:
                 button.draw()
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
             self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
+            self.upgrade_text = self.font.render(f"Upgrade", True, (255, 255, 255))
             self.window.blit(self.attack_damage_text, (10, 510))
             self.window.blit(self.attack_cooldown_text, (370, 510))
-
+            self.window.blit(self.upgrade_text, (230, 540))
+            self.window.blit(self.upgrade_text, (580, 540))
+            
         else:
             health_box.draw()
             health_bar.draw()
