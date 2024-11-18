@@ -83,36 +83,89 @@ class Stage_Select_Screen:
         self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select.png'))
         self.background = pygame.transform.scale(self.background, (window_width, window_height))
         self.font = pygame.font.SysFont(None, 55)
-        self.selection = None
-    def render(self, window):
-        self.window.blit(self.background, (0, 0))
+        self.stage_selection = None
+        self.difficulty_selection = None
+        self.hovered_stage = None
+        self.hovered_difficulty = None
+        self.start_button_hovered = False
+        self.stage1_button_rect = pygame.Rect(147, 125, 236, 110)
+        self.stage2_button_rect = pygame.Rect(147, 245, 236, 110)
+        self.stage3_button_rect = pygame.Rect(147, 365, 236, 110)
+        self.easy_button_rect = pygame.Rect(403, 398, 76, 34)
+        self.medium_button_rect = pygame.Rect(491, 398, 77, 34)
+        self.hard_button_rect = pygame.Rect(579, 398, 77, 34)
+        self.start_button_rect = pygame.Rect(402, 441, 254, 37)
 
+        self.click_sound = pygame.mixer.Sound(os.path.join('game_assests/sounds', 'click.mp3'))
+        self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+    def render(self):
+        self.window.blit(self.background, (0, 0))
+        if self.hovered_stage == "stage1" or self.stage_selection == "stage1":
+            self._draw_overlay(self.stage1_button_rect)
+        if self.hovered_stage == "stage2" or self.stage_selection == "stage2":
+            self._draw_overlay(self.stage2_button_rect)
+        if self.hovered_stage == "stage3" or self.stage_selection == "stage3":
+            self._draw_overlay(self.stage3_button_rect)
+        if self.hovered_difficulty == "easy" or self.difficulty_selection == "easy":
+            self._draw_overlay(self.easy_button_rect)
+        if self.hovered_difficulty == "medium" or self.difficulty_selection == "medium":
+            self._draw_overlay(self.medium_button_rect)
+        if self.hovered_difficulty == "hard" or self.difficulty_selection == "hard":
+            self._draw_overlay(self.hard_button_rect)
+        if self.start_button_hovered:
+            self._draw_overlay(self.start_button_rect)
         pygame.display.update()
-        self.stage1_button_rect = pygame.Rect(60, 300, 196, 196)
-        self.stage2_button_rect = pygame.Rect(540, 300, 196, 196)
-    
-    def check_for_click(self, window):
+
+    def check_for_click(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            mouse_pos = pygame.mouse.get_pos()
+            self.hovered_stage = None
+            self.hovered_difficulty = None
+            self.start_button_hovered = False
+
+            if self.stage1_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage1"
+            if self.stage2_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage2"
+            if self.stage3_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage3"
+
+            if self.easy_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "easy"
+            if self.medium_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "medium"
+            if self.hard_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "hard"
+
+            if self.start_button_rect.collidepoint(mouse_pos):
+                self.start_button_hovered = True
             if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                if self.stage1_button_rect.collidepoint(mouse_pos):
-                    self.selection = 1
-                    return True
-                if self.stage2_button_rect.collidepoint(mouse_pos):
-                    self.selection = 2
-                    return True
-                
-        return False
-    
+                pygame.mixer.Sound.play(self.click_sound)
+                if self.hovered_stage:
+                    self.stage_selection = self.hovered_stage
+                if self.hovered_difficulty:
+                    self.difficulty_selection = self.hovered_difficulty
+                if self.start_button_hovered:
+                    return True  
+
+    def _draw_overlay(self, rect):
+        overlay = pygame.Surface((rect.width, rect.height))
+        overlay.set_alpha(90)
+        overlay.fill((0, 0, 0))
+        self.window.blit(overlay, (rect.x, rect.y))
+
     def return_selection(self):
-        return self.selection
-    
+        return {
+            "stage": self.stage_selection,
+            "difficulty": self.difficulty_selection
+        }
+
 class MainGameScreen:
     """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
-    def __init__(self, window, map):
+    def __init__(self, window, map, difficulty):
         self.window = window
         """The window for the game."""
         """Scales the image in self.background appropriately and then saves it back to self.background."""
@@ -175,6 +228,7 @@ class MainGameScreen:
         """A list to hold all the towers that have been placed."""
 
         # Wave and Enemy
+        self.difficulty = difficulty
         self.wave = 1
         """Stores which wave number is currently displayed to the player"""
         self._waves = []  # list of waves
@@ -584,36 +638,51 @@ def main():
     start_screen = StartScreen(window)
     stage_select = Stage_Select_Screen(window)
     game_state = 'start_screen'
+    main_game_screen = None  
+
     while True:
         if game_state == 'start_screen':
             start_screen.render()
             if start_screen.check_for_click():
                 game_state = 'stage_select'
-        
-        elif game_state == 'stage_select':
-            stage_select.render(window)
-            if stage_select.check_for_click(window):
-                map = stage_select.return_selection()
-                game_state = 'main_game'
-                main_game_screen = MainGameScreen(window, map)
-                main_game_screen.set_health(100)
-                main_game_screen.set_money(500)
-        
-        elif game_state == 'main_game':
-            main_game_screen.render()
-            main_game_screen.check_for_click()
-            if main_game_screen.pause:
-                result = main_game_screen.pause_screen()
-                if result == "resume":
-                    main_game_screen.pause = False
-                elif result == "stage_select":
-                    game_state = 'stage_select'
-                    main_game_screen = None
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+        elif game_state == 'stage_select':
+            stage_select.render()
+            if not pygame.mixer.music.get_busy():
+                pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+                pygame.mixer.music.play(-1)
+            if stage_select.check_for_click():
+                selection = stage_select.return_selection()
+                if selection["stage"] and selection["difficulty"]:
+                    map = int(selection["stage"][-1])  
+                    difficulty = selection["difficulty"]
+                    game_state = 'main_game'
+                    main_game_screen = MainGameScreen(window, map, difficulty)
+                    main_game_screen.set_health(100)
+                    main_game_screen.set_money(500)
+                    pygame.mixer.music.stop()
+
+        elif game_state == 'main_game':
+            if main_game_screen is not None:
+                main_game_screen.render()
+                main_game_screen.check_for_click()
+
+                if main_game_screen.return_to_stage_select:
+                    game_state = 'stage_select'
+                    main_game_screen = None  
+
+                elif main_game_screen.pause:
+                    result = main_game_screen.pause_screen()
+                    if result == "resume":
+                        main_game_screen.pause = False
+                    elif result == "stage_select":
+                        game_state = 'stage_select'
+                        main_game_screen = None  
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
         fpsClock.tick(FPS)
 
