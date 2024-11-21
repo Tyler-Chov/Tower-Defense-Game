@@ -2,6 +2,7 @@ import pygame, sys, os, button
 from tower import Tower
 from enemy import Enemy
 from waves import Wave
+import text_button
 
 FPS = 60
 fpsClock = pygame.time.Clock()
@@ -76,7 +77,6 @@ class StartScreen:
                 if self.start_button_rect.collidepoint(mouse_pos):
                     return True
         return False
-
 
 class MainGameScreen:
     """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
@@ -207,6 +207,8 @@ class MainGameScreen:
         ]
         """Makes the rectangles for the upgrade boxes."""
 
+        upgrade_damage_button = text_button.Button(230, 540, 'Upgrade', window)
+        upgrade_cooldown_button = text_button.Button(580, 540, 'Upgrade', window)
         upgrade_buttons = [
             Rectangle(200, 525, 130, 50, (0, 180, 0)),
             Rectangle(550, 525, 130, 50, (0, 180, 0)),
@@ -220,23 +222,28 @@ class MainGameScreen:
         if self.grid_active:
             """Checks if grid is currently active, then renders a preview of the tower selected."""
             self.render_tower_preview()
-
+        
         bottom_bar.draw()
+        
         if self.selected_tower:
             """Renders the attack radius of the selected tower."""
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
             # Logic for upgrades and tower selection info should go here
             for box in upgrade_boxes:
                 box.draw()
-            for button in upgrade_buttons:
-                button.draw()
+            if upgrade_damage_button.draw_button():
+                if self.money >= 50:
+                    self.selected_tower._damage *= 1.5
+                    self.remove_money(50)
+                
+            if upgrade_cooldown_button.draw_button():
+                if self.money >= 50:
+                    self.selected_tower._shot_cooldown *= .75
+                    self.remove_money(50)
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
             self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
-            self.upgrade_text = self.font.render(f"Upgrade", True, (255, 255, 255))
             self.window.blit(self.attack_damage_text, (10, 510))
             self.window.blit(self.attack_cooldown_text, (370, 510))
-            self.window.blit(self.upgrade_text, (230, 540))
-            self.window.blit(self.upgrade_text, (580, 540))
             
         else:
             health_box.draw()
@@ -314,6 +321,7 @@ class MainGameScreen:
 
                 # selecting towers.
                 tower_clicked = False
+                bottom_bar = pygame.rect.Rect(0, (window_height - 100), window_width, 100)
                 for tower in self.placed_towers:
                     tower_size = int(self.grid_size * self.tower_size * 0.8)
                     tower_rect = pygame.rect.Rect(
@@ -325,7 +333,7 @@ class MainGameScreen:
                         self.selected_tower = tower
                         tower_clicked = True
                         break
-                if not tower_clicked:
+                if not tower_clicked and not bottom_bar.collidepoint(mouse_pos):
                     self.selected_tower = None
 
                 # Pause button functionality
@@ -335,6 +343,9 @@ class MainGameScreen:
                         self.pause = False
                     elif self.pause == False:
                         self.pause = True
+                
+                # upgrade button functionality here
+                
 
             # Debug toggle button.
             elif event.type == pygame.KEYDOWN:
