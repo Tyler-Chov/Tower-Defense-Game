@@ -3,7 +3,7 @@ from pygame.locals import *
 
 pygame.init()
 
-font = pygame.font.SysFont('impact', 20)
+font = pygame.font.SysFont(None , 26)
 
 #define colours
 bg = (204, 102, 0)

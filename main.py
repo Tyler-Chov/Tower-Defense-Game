@@ -87,7 +87,7 @@ class MainGameScreen:
         """Loads the image."""
         self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         """Scales the image in self.background appropriately and then saves it back to self.background."""
-        self.font = pygame.font.SysFont('trebuchetms', 18)
+        self.font = pygame.font.SysFont(None, 22)
         """Sets the font style to be used."""
         self.health = 0
         """Holds the amount of health the player has remaining."""
@@ -232,30 +232,18 @@ class MainGameScreen:
             for box in upgrade_boxes:
                 box.draw()
             if upgrade_damage_button.draw_button():
-                print("upgrade damage")
+                if self.money >= 50:
+                    self.selected_tower._damage *= 1.5
+                    self.remove_money(50)
+                
             if upgrade_cooldown_button.draw_button():
-                print("upgrade_cooldown")
-
-            """
-            for button in upgrade_buttons:
-                button.draw()
+                if self.money >= 50:
+                    self.selected_tower._shot_cooldown *= .75
+                    self.remove_money(50)
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
             self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
-            self.upgrade_text = self.font.render(f"Upgrade", True, (255, 255, 255))
             self.window.blit(self.attack_damage_text, (10, 510))
             self.window.blit(self.attack_cooldown_text, (370, 510))
-            self.window.blit(self.upgrade_text, (230, 540))
-            self.window.blit(self.upgrade_text, (580, 540))
-            """
-
-            """
-            if upgrade_boxes[0].collidepoint(mouse_pos):
-                self.selected_tower._damage += 2
-                self.remove_money(50)
-            if upgrade_boxes[1].collidepoint(mouse_pos):
-                self.selected_tower._shot_cooldown -= 2
-                self.remove_money(50)
-            """
             
         else:
             health_box.draw()
