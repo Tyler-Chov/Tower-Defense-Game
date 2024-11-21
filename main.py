@@ -87,7 +87,7 @@ class MainGameScreen:
         """Loads the image."""
         self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         """Scales the image in self.background appropriately and then saves it back to self.background."""
-        self.font = pygame.font.SysFont(None, 22)
+        self.font = pygame.font.SysFont('trebuchetms', 18)
         """Sets the font style to be used."""
         self.health = 0
         """Holds the amount of health the player has remaining."""
@@ -220,8 +220,9 @@ class MainGameScreen:
         if self.grid_active:
             """Checks if grid is currently active, then renders a preview of the tower selected."""
             self.render_tower_preview()
-
+        
         bottom_bar.draw()
+        
         if self.selected_tower:
             """Renders the attack radius of the selected tower."""
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
@@ -237,6 +238,14 @@ class MainGameScreen:
             self.window.blit(self.attack_cooldown_text, (370, 510))
             self.window.blit(self.upgrade_text, (230, 540))
             self.window.blit(self.upgrade_text, (580, 540))
+            """
+            if upgrade_boxes[0].collidepoint(mouse_pos):
+                self.selected_tower._damage += 2
+                self.remove_money(50)
+            if upgrade_boxes[1].collidepoint(mouse_pos):
+                self.selected_tower._shot_cooldown -= 2
+                self.remove_money(50)
+            """
             
         else:
             health_box.draw()
@@ -335,6 +344,9 @@ class MainGameScreen:
                         self.pause = False
                     elif self.pause == False:
                         self.pause = True
+                
+                # upgrade button functionality here
+                
 
             # Debug toggle button.
             elif event.type == pygame.KEYDOWN:
