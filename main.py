@@ -77,6 +77,72 @@ class StartScreen:
                     return True
         return False
 
+font = pygame.font.SysFont('impact', 20)
+
+#define colours
+bg = (204, 102, 0)
+red = (255, 0, 0)
+black = (0, 0, 0)
+white = (255, 255, 255)
+green = (0, 180, 0)
+
+#define global variable
+clicked = False
+counter = 0
+
+class Button():
+        
+    #colours for button and text
+    button_col = green
+    hover_col = (0, 225, 0)
+    click_col = (0, 150, 0)
+    text_col = white
+    width = 100
+    height = 50
+    def __init__(self, x, y, text, surface):
+        self.x = x
+        self.y = y
+        self.text = text
+
+        self.surface = surface
+
+    def draw_button(self):
+
+        global clicked
+        action = False
+
+        #get mouse position
+        pos = pygame.mouse.get_pos()
+
+        #create pygame Rect object for the button
+        button_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        
+        #check mouseover and clicked conditions
+        if button_rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1:
+                clicked = True
+                pygame.draw.rect(self.surface, self.click_col, button_rect)
+            elif pygame.mouse.get_pressed()[0] == 0 and clicked == True:
+                clicked = False
+                action = True
+            else:
+                pygame.draw.rect(self.surface, self.hover_col, button_rect)
+        else:
+            pygame.draw.rect(self.surface, self.button_col, button_rect)
+        
+        #add shading to button
+        pygame.draw.line(self.surface, white, (self.x, self.y), (self.x + self.width, self.y), 2)
+        pygame.draw.line(self.surface, white, (self.x, self.y), (self.x, self.y + self.height), 2)
+        pygame.draw.line(self.surface, black, (self.x, self.y + self.height), (self.x + self.width, self.y + self.height), 2)
+        pygame.draw.line(self.surface, black, (self.x + self.width, self.y), (self.x + self.width, self.y + self.height), 2)
+
+        #add text to button
+        text_img = font.render(self.text, True, self.text_col)
+        text_len = text_img.get_width()
+        self.surface.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 25))
+        return action
+
+
 
 class MainGameScreen:
     """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
@@ -207,6 +273,8 @@ class MainGameScreen:
         ]
         """Makes the rectangles for the upgrade boxes."""
 
+        upgrade_damage_button = Button(230, 540, 'Upgrade', window)
+        upgrade_cooldown_button = Button(580, 540, 'Upgrade', window)
         upgrade_buttons = [
             Rectangle(200, 525, 130, 50, (0, 180, 0)),
             Rectangle(550, 525, 130, 50, (0, 180, 0)),
@@ -229,6 +297,12 @@ class MainGameScreen:
             # Logic for upgrades and tower selection info should go here
             for box in upgrade_boxes:
                 box.draw()
+            if upgrade_damage_button.draw_button():
+                print("upgrade damage")
+            if upgrade_cooldown_button.draw_button():
+                print("upgrade_cooldown")
+
+            """
             for button in upgrade_buttons:
                 button.draw()
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
@@ -238,6 +312,8 @@ class MainGameScreen:
             self.window.blit(self.attack_cooldown_text, (370, 510))
             self.window.blit(self.upgrade_text, (230, 540))
             self.window.blit(self.upgrade_text, (580, 540))
+            """
+
             """
             if upgrade_boxes[0].collidepoint(mouse_pos):
                 self.selected_tower._damage += 2
@@ -323,6 +399,7 @@ class MainGameScreen:
 
                 # selecting towers.
                 tower_clicked = False
+                bottom_bar = pygame.rect.Rect(0, (window_height - 100), window_width, 100)
                 for tower in self.placed_towers:
                     tower_size = int(self.grid_size * self.tower_size * 0.8)
                     tower_rect = pygame.rect.Rect(
@@ -334,7 +411,7 @@ class MainGameScreen:
                         self.selected_tower = tower
                         tower_clicked = True
                         break
-                if not tower_clicked:
+                if not tower_clicked and not bottom_bar.collidepoint(mouse_pos):
                     self.selected_tower = None
 
                 # Pause button functionality
