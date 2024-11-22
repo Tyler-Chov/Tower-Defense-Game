@@ -1,14 +1,19 @@
-import pygame, sys, os, button
+import pygame, sys, os, button, pygame_widgets
 from tower import Tower
 from enemy import Enemy
 from waves import Wave
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
 import text_button
 
 FPS = 60
 fpsClock = pygame.time.Clock()
 window_width = 800
 window_height = 600
-
+global sound_volume 
+global bgm_volume
+sound_volume = 1
+bgm_volume = 1
 pygame.display.set_caption('Tower Defense Game')
 pygame.init()
 window = pygame.display.set_mode((window_width, window_height))
@@ -85,14 +90,104 @@ class StartScreen:
                     return True
         return False
 
-class MainGameScreen:
-    """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
+
+class Stage_Select_Screen:
     def __init__(self, window):
         self.window = window
+        self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select.png'))
+        self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        self.font = pygame.font.SysFont(None, 55)
+        self.stage_selection = None
+        self.difficulty_selection = None
+        self.hovered_stage = None
+        self.hovered_difficulty = None
+        self.start_button_hovered = False
+        self.stage1_button_rect = pygame.Rect(147, 125, 236, 110)
+        self.stage2_button_rect = pygame.Rect(147, 245, 236, 110)
+        self.stage3_button_rect = pygame.Rect(147, 365, 236, 110)
+        self.easy_button_rect = pygame.Rect(403, 398, 76, 34)
+        self.medium_button_rect = pygame.Rect(491, 398, 77, 34)
+        self.hard_button_rect = pygame.Rect(579, 398, 77, 34)
+        self.start_button_rect = pygame.Rect(402, 441, 254, 37)
+
+        self.click_sound = pygame.mixer.Sound(os.path.join('game_assests/sounds', 'click.mp3'))
+        self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+    def render(self):
+        self.window.blit(self.background, (0, 0))
+        if self.hovered_stage == "stage1" or self.stage_selection == "stage1":
+            self._draw_overlay(self.stage1_button_rect)
+        if self.hovered_stage == "stage2" or self.stage_selection == "stage2":
+            self._draw_overlay(self.stage2_button_rect)
+        if self.hovered_stage == "stage3" or self.stage_selection == "stage3":
+            self._draw_overlay(self.stage3_button_rect)
+        if self.hovered_difficulty == "easy" or self.difficulty_selection == "easy":
+            self._draw_overlay(self.easy_button_rect)
+        if self.hovered_difficulty == "medium" or self.difficulty_selection == "medium":
+            self._draw_overlay(self.medium_button_rect)
+        if self.hovered_difficulty == "hard" or self.difficulty_selection == "hard":
+            self._draw_overlay(self.hard_button_rect)
+        if self.start_button_hovered:
+            self._draw_overlay(self.start_button_rect)
+        pygame.display.update()
+
+    def check_for_click(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            mouse_pos = pygame.mouse.get_pos()
+            self.hovered_stage = None
+            self.hovered_difficulty = None
+            self.start_button_hovered = False
+
+            if self.stage1_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage1"
+            if self.stage2_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage2"
+            if self.stage3_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage3"
+
+            if self.easy_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "easy"
+            if self.medium_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "medium"
+            if self.hard_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "hard"
+
+            if self.start_button_rect.collidepoint(mouse_pos):
+                self.start_button_hovered = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.click_sound.set_volume(sound_volume)
+                pygame.mixer.Sound.play(self.click_sound)
+                if self.hovered_stage:
+                    self.stage_selection = self.hovered_stage
+                if self.hovered_difficulty:
+                    self.difficulty_selection = self.hovered_difficulty
+                if self.start_button_hovered:
+                    return True  
+
+    def _draw_overlay(self, rect):
+        overlay = pygame.Surface((rect.width, rect.height))
+        overlay.set_alpha(90)
+        overlay.fill((0, 0, 0))
+        self.window.blit(overlay, (rect.x, rect.y))
+
+    def return_selection(self):
+        return {
+            "stage": self.stage_selection,
+            "difficulty": self.difficulty_selection
+        }
+    
+    def reset_selection(self):
+        self.stage_selection = None
+        self.difficulty_selection = None
+
+
+class MainGameScreen:
+    """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
+    def __init__(self, window, map, difficulty):
+        self.window = window
         """The window for the game."""
-        self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
-        """Loads the image."""
-        self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
         """Scales the image in self.background appropriately and then saves it back to self.background."""
         self.font = pygame.font.SysFont(None, 22)
         """Sets the font style to be used."""
@@ -105,28 +200,40 @@ class MainGameScreen:
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
         """Renders the money text so the player knows how much money they have remaining."""
 
-        # Pause button
-        pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
+        # Wave Pause button
+        wave_pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         """The image of the pause button."""
-        self.pause_button = button.Button(710, 510, pause_img, 0.15)
+        self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
-        self.pause = True
+
+        self.game_pause_img = pygame.image.load(os.path.join('game_assests', 'pause.png'))
+        self.game_pause_img = pygame.transform.scale(self.game_pause_img, (30, 30))
+        self.wave_pause = False
+        self.pause = False
         """Sets pause to True when initially ran."""
+        self.map = map
+        self.return_to_stage_select = False
 
         # Map Variables
-        self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322),
-                         (444, 226), (700, 226), (800, 226))
-        """Sets the path for enemies to traverse."""
-        self.collision_rects = [
-            pygame.Rect(min(0, 140), min(248, 300), max(0, 140) - min(0, 140), max(248, 300) - min(248, 300)),
-            pygame.Rect(min(140, 96), min(300, 100), max(140, 96) - min(140, 96), max(300, 100) - min(300, 100)),
-            pygame.Rect(min(96, 278), min(100, 146), max(96, 278) - min(96, 278), max(146, 100) - min(100, 146)),
-            pygame.Rect(min(278, 230), min(146, 348), max(278, 230) - min(278, 230), max(348, 146) - min(146, 348)),
-            pygame.Rect(min(230, 470), min(348, 299), max(470, 230) - min(230, 470), max(348, 299) - min(299, 348)),
-            pygame.Rect(min(470, 418), min(299, 200), max(470, 418) - min(470, 418), max(299, 200) - min(200, 299)),
-            pygame.Rect(min(418, 700), min(200, 250), max(700, 418) - min(418, 700), max(250, 200) - min(200, 250)),
-        ]
-        """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
+        if self.map == 1:
+            self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
+            """Loads the image."""
+            self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
+            self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322),
+                            (444, 226), (700, 226), (800, 226))
+            """Sets the path for enemies to traverse."""
+            self.collision_rects = [
+                pygame.Rect(min(0, 140), min(248, 300), max(0, 140) - min(0, 140), max(248, 300) - min(248, 300)),
+                pygame.Rect(min(140, 96), min(300, 100), max(140, 96) - min(140, 96), max(300, 100) - min(300, 100)),
+                pygame.Rect(min(96, 278), min(100, 146), max(96, 278) - min(96, 278), max(146, 100) - min(100, 146)),
+                pygame.Rect(min(278, 230), min(146, 348), max(278, 230) - min(278, 230), max(348, 146) - min(146, 348)),
+                pygame.Rect(min(230, 470), min(348, 299), max(470, 230) - min(230, 470), max(348, 299) - min(299, 348)),
+                pygame.Rect(min(470, 418), min(299, 200), max(470, 418) - min(470, 418), max(299, 200) - min(200, 299)),
+                pygame.Rect(min(418, 700), min(200, 250), max(700, 418) - min(418, 700), max(250, 200) - min(200, 250)),
+            ]
+            """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
+        elif map == 2:
+            pass
 
         # Tower Variables
         self.grid_active = False
@@ -141,6 +248,7 @@ class MainGameScreen:
         """A list to hold all the towers that have been placed."""
 
         # Wave and Enemy
+        self.difficulty = difficulty
         self.wave = 1
         """Stores which wave number is currently displayed to the player"""
         self._waves = []  # list of waves
@@ -156,8 +264,10 @@ class MainGameScreen:
             """Determines amount of enemies to be spawned, dependent on wave number."""
             enemy_hp = 10 + (5 * wave_number)
             """Increases health of the enemies, dependent on wave number."""
+            speed = 1 + (0.2 * wave_number)
+            """Increases speed of the enemies, dependent on wave number."""
             wave_data = [
-                Enemy('circle', enemy_hp, 1, 1, self.map_path) for i in range(enemy_count)
+                Enemy('circle', enemy_hp, speed, 1, self.map_path) for i in range(enemy_count)
             ]
             """Generate wave data, to be added to self._waves"""
             self._waves.append(Wave(wave_data, 60))
@@ -173,34 +283,42 @@ class MainGameScreen:
         self.window.blit(self.background, (0, 0))
         """Sets window"""
 
-        class Rectangle():
+        class Rectangle:
             """Creates rectangles for the UI."""
             def __init__(self, x, y, width, height, color):
                 self.x = x
                 """The x position of the rectangle."""
                 self.y = y
-                """The y position of the rectangle"""
+                """The y position of the rectangle."""
                 self.width = width
                 """The width of the rectangle."""
                 self.height = height
                 """The height of the rectangle."""
                 self.color = color
                 """The color of the rectangle."""
+                self.rect = pygame.Rect(x, y, width, height)
+                """The pygame.Rect object for collision detection."""
 
             def draw(self):
                 """Draws the rectangle."""
-                pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
+                pygame.draw.rect(window, self.color, self.rect)
+
+            def is_hovered(self, mouse_pos):
+                """Checks if the mouse is hovering over the rectangle."""
+                return self.rect.collidepoint(mouse_pos)
 
         # create menus, tower slots, and tower image
-        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150, 150, 150))
-        """Menu on the bottom, currently hold nothing."""
         side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150, 150, 150))
         """Menu on the right side, shows player stats and towers that can be used."""
+        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150, 150, 150))
+        """Menu on the bottom, currently hold nothing."""
+
+        box_unselected_color = (100, 100, 100)
         tower_boxes = [
-            Rectangle(705, 100, 90, 90, (100, 100, 100)),
-            Rectangle(705, 200, 90, 90, (100, 100, 100)),
-            Rectangle(705, 300, 90, 90, (100, 100, 100)),
-            Rectangle(705, 400, 90, 90, (100, 100, 100))
+            Rectangle(705, 100, 90, 90, box_unselected_color),
+            Rectangle(705, 200, 90, 90, box_unselected_color),
+            Rectangle(705, 300, 90, 90, box_unselected_color),
+            Rectangle(705, 400, 90, 90, box_unselected_color)
         ]
         """Makes the rectangles for the tower boxes."""
 
@@ -278,7 +396,7 @@ class MainGameScreen:
             for tower in self.placed_towers:
                 print(tower._position) 
             '''
-        if not self.pause:
+        if not self.wave_pause:
             
             self.update_waves()
             for enemy in self._enemy_list:
@@ -293,6 +411,12 @@ class MainGameScreen:
 
         # Display menu and UI
         side_bar.draw()
+        mouse_pos = pygame.mouse.get_pos()
+        for box in tower_boxes:
+            if box.is_hovered(mouse_pos):
+                box.color = (70, 70, 70)
+            else:
+                box.color = box_unselected_color
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
@@ -302,7 +426,8 @@ class MainGameScreen:
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
-        self.pause_button.draw(window)
+        self.wave_pause_button.draw(window)
+        self.window.blit(self.game_pause_img, (10, 10))
         pygame.display.update()
 
     def check_for_click(self):
@@ -343,16 +468,33 @@ class MainGameScreen:
                 if not tower_clicked and not bottom_bar.collidepoint(mouse_pos):
                     self.selected_tower = None
 
-                # Pause button functionality
-                pause_button = pygame.Rect(710, 510, 75, 75)
-                if pause_button.collidepoint(mouse_pos):
-                    if self.pause == True:
+                # Wave Pause button functionality
+                wave_pause_button = pygame.Rect(710, 510, 75, 75)
+                if wave_pause_button.collidepoint(mouse_pos):
+                    if self.wave_pause == True:
+                        self.wave_pause = False
+                    elif self.wave_pause == False:
+                        self.wave_pause = True
+                    return
+                 
+                # Game Pause button functionality
+                game_pause_button = pygame.Rect(10, 10, 30, 30)
+                if game_pause_button.collidepoint(mouse_pos):
+                    self.pause = True
+                    self.wave_pause = True
+                    result = self.pause_screen()
+                    if result == "resume":
+                        self.wave_pause = False
                         self.pause = False
-                    elif self.pause == False:
-                        self.pause = True
+
+                        return
+                    elif result == "stage_select":
+                        self.return_to_stage_select = True
+                        return "stage_select"
+                    return
+
                 
                 # upgrade button functionality here
-                
 
             # Debug toggle button.
             elif event.type == pygame.KEYDOWN:
@@ -400,8 +542,8 @@ class MainGameScreen:
             self.selected_tower = False
             self.remove_money(200)
         else:
-            print("Cannot place the tower here. Collision detected.")
-
+            #print("Cannot place the tower here. Collision detected.")
+            pass
     def check_collision(self, x, y):
         preview_size = self.grid_size * self.tower_size
 
@@ -456,6 +598,115 @@ class MainGameScreen:
                     self._enemy_list.append(new_enemy)
                 self._time_since_previous_spawn = 0
 
+    def setting_screen(self):
+        global sound_volume, bgm_volume
+
+        overlay = pygame.Surface((window_width, window_height))
+        overlay.fill((120, 120, 120, 100))
+        self.window.blit(overlay, (0, 0))
+
+        font = pygame.font.SysFont(None, 40)
+        label_font = pygame.font.SysFont(None, 30)
+        setting_text = pygame.font.SysFont(None, 60)
+
+        bgm_slider = Slider(self.window, window_width // 2 - 100, window_height // 2 - 50, 200, 20, min=0, max=10, step=1)
+        bgm_slider.setValue(int(bgm_volume * 10))
+        sfx_slider = Slider(self.window, window_width // 2 - 100, window_height // 2 + 50, 200, 20, min=0, max=10, step=1)
+        sfx_slider.setValue(int(sound_volume * 10))
+
+        bgm_label = label_font.render("BGM", True, (255, 255, 255))
+        bgm_label_rect = bgm_label.get_rect(center=(window_width // 2, window_height // 2 - 80))
+        sfx_label = label_font.render("SFX", True, (255, 255, 255))
+        sfx_label_rect = sfx_label.get_rect(center=(window_width // 2, window_height // 2 + 20))
+        back_button_rect = pygame.Rect(window_width // 2 - 100, window_height - 100, 200, 50)
+        back_text = font.render("Back", True, (255, 255, 255))
+        setting_text = setting_text.render("Settings", True, (255, 255, 255))
+        setting_text_rect = setting_text.get_rect(center=(window_width // 2, 120))
+
+        running = True
+        while running:
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if back_button_rect.collidepoint(mouse_pos):
+                        running = False
+    
+            pygame_widgets.update(events)
+            bgm_value = bgm_slider.getValue() / 10.0 
+            sfx_value = sfx_slider.getValue() / 10.0  
+            bgm_volume = bgm_value
+            sound_volume = sfx_value
+            pygame.mixer.music.set_volume(bgm_volume) 
+            self.window.fill((30, 30, 30))
+            self.window.blit(overlay, (0, 0))
+            pygame.draw.rect(self.window, (100, 100, 100), back_button_rect)
+            self.window.blit(back_text, (back_button_rect.centerx - back_text.get_width() // 2, back_button_rect.centery - back_text.get_height() // 2))
+            self.window.blit(bgm_label, bgm_label_rect)
+            self.window.blit(sfx_label, sfx_label_rect)
+            self.window.blit(setting_text, setting_text_rect)
+            bgm_slider.draw()
+            sfx_slider.draw()
+            pygame.display.flip()
+
+    def pause_screen(self):
+        paused = True
+        game_snapshot = self.window.copy() 
+        overlay = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 128))  
+        font = pygame.font.SysFont(None, 30)
+        pause_font = pygame.font.SysFont(None, 80)
+        pause_text = pause_font.render("Paused", True, (255, 255, 255))
+
+        button_width, button_height = 200, 50
+        resume_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 220, button_width, button_height)
+        stage_select_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 290, button_width, button_height)
+        setting_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 360, button_width, button_height)
+        quit_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 430, button_width, button_height)
+
+        resume_text = font.render("Resume", True, (255, 255, 255))
+        stage_select_text = font.render("Stage Select", True, (255, 255, 255))
+        setting_text = font.render("Settings", True, (255, 255, 255))
+        quit_text = font.render("Quit", True, (255, 255, 255))
+
+        while paused:
+            self.window.blit(game_snapshot, (0, 0))
+            self.window.blit(overlay, (0, 0))
+            self.window.blit(pause_text, (window_width // 2 - pause_text.get_width() // 2, 100))
+            cursor_pos = pygame.mouse.get_pos()
+            for button_rect, text, color in [
+                (resume_button_rect, resume_text, (100, 100, 100) if resume_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (stage_select_button_rect, stage_select_text, (100, 100, 100) if stage_select_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (setting_button_rect, setting_text, (100, 100, 100) if setting_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (quit_button_rect, quit_text, (100, 100, 100) if quit_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+            ]:
+                pygame.draw.rect(self.window, color, button_rect)
+                self.window.blit(text, (button_rect.centerx - text.get_width() // 2, button_rect.centery - text.get_height() // 2))
+
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if resume_button_rect.collidepoint(mouse_pos):
+                        paused = False  
+                    elif stage_select_button_rect.collidepoint(mouse_pos):
+                        return "stage_select"
+                    elif setting_button_rect.collidepoint(mouse_pos):
+                        self.setting_screen() 
+                    elif quit_button_rect.collidepoint(mouse_pos):
+                        pygame.quit()
+                        sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    paused = False 
+        self.pause = False
+        self.wave_pause = False
+
     def remove_health(self, health):
         self.health -= health
         self.health_text = self.font.render(f'Health: {self.health}', True, (255, 255, 255))
@@ -478,7 +729,6 @@ class MainGameScreen:
         self.money = money
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
-    # Debugging Functions
     def update_cursor_position(self):
         """Update and render the cursor position."""
         mouse_pos = pygame.mouse.get_pos()
@@ -502,23 +752,56 @@ class MainGameScreen:
 
 def main():
     start_screen = StartScreen(window)
-    main_game_screen = MainGameScreen(window)
+    stage_select = Stage_Select_Screen(window)
     game_state = 'start_screen'
-    main_game_screen.set_health(100)
-    main_game_screen.set_money(500)
+    main_game_screen = None  
+
     while True:
         if game_state == 'start_screen':
             start_screen.render()
             if start_screen.check_for_click():
-                game_state = 'main_game'
+                game_state = 'stage_select'
+
+        elif game_state == 'stage_select':
+            stage_select.render()
+            if not pygame.mixer.music.get_busy():
+                pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+                pygame.mixer.music.play(-1)
+            if stage_select.check_for_click():
+                selection = stage_select.return_selection()
+                if selection["stage"] and selection["difficulty"]:
+                    stage_select.reset_selection()
+                    map = int(selection["stage"][-1])  
+                    difficulty = selection["difficulty"]
+                    game_state = 'main_game'
+                    main_game_screen = MainGameScreen(window, map, difficulty)
+                    main_game_screen.set_health(100)
+                    main_game_screen.set_money(500)
+                    pygame.mixer.music.stop()
 
         elif game_state == 'main_game':
-            main_game_screen.render()
-            main_game_screen.check_for_click()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+            if main_game_screen is not None:
+                main_game_screen.render()
+                main_game_screen.check_for_click()
+
+                if main_game_screen.return_to_stage_select:
+                    game_state = 'stage_select'
+                    main_game_screen = None  
+
+                elif main_game_screen.pause:
+                    result = main_game_screen.pause_screen()
+                    if result == "resume":
+                        main_game_screen.pause = False
+                    elif result == "stage_select":
+                        game_state = 'stage_select'
+                        stage_select.selected_stage = None
+                        stage_select.selected_difficulty = None 
+                        main_game_screen = None  
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
         fpsClock.tick(FPS)
 
