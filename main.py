@@ -1,13 +1,18 @@
-import pygame, sys, os, button
+import pygame, sys, os, button, pygame_widgets
 from tower import Tower
 from enemy import Enemy
 from waves import Wave
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
 
 FPS = 60
 fpsClock = pygame.time.Clock()
 window_width = 800
 window_height = 600
-
+global sound_volume 
+global bgm_volume
+sound_volume = 1
+bgm_volume = 1
 pygame.display.set_caption('Tower Defense Game')
 pygame.init()
 window = pygame.display.set_mode((window_width, window_height))
@@ -143,6 +148,7 @@ class Stage_Select_Screen:
             if self.start_button_rect.collidepoint(mouse_pos):
                 self.start_button_hovered = True
             if event.type == pygame.MOUSEBUTTONDOWN:
+                self.click_sound.set_volume(sound_volume)
                 pygame.mixer.Sound.play(self.click_sound)
                 if self.hovered_stage:
                     self.stage_selection = self.hovered_stage
@@ -162,6 +168,10 @@ class Stage_Select_Screen:
             "stage": self.stage_selection,
             "difficulty": self.difficulty_selection
         }
+    
+    def reset_selection(self):
+        self.stage_selection = None
+        self.difficulty_selection = None
 
 class MainGameScreen:
     """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
@@ -532,32 +542,96 @@ class MainGameScreen:
                     """Records the next enemy to be spawned."""
                     self._enemy_list.append(new_enemy)
                 self._time_since_previous_spawn = 0
-    
-    def pause_screen(self):
-        if self.return_to_stage_select:
-            return "stage_select"
+
+    def setting_screen(self):
+        global sound_volume, bgm_volume
 
         overlay = pygame.Surface((window_width, window_height))
-        overlay.fill((0, 0, 0))
-        overlay.set_alpha(20)
+        overlay.fill((120, 120, 120, 100))
         self.window.blit(overlay, (0, 0))
 
+        font = pygame.font.SysFont(None, 40)
+        label_font = pygame.font.SysFont(None, 30)
+        setting_text = pygame.font.SysFont(None, 60)
+
+        bgm_slider = Slider(self.window, window_width // 2 - 100, window_height // 2 - 50, 200, 20, min=0, max=10, step=1)
+        bgm_slider.setValue(int(bgm_volume * 10))
+        sfx_slider = Slider(self.window, window_width // 2 - 100, window_height // 2 + 50, 200, 20, min=0, max=10, step=1)
+        sfx_slider.setValue(int(sound_volume * 10))
+
+        bgm_label = label_font.render("BGM", True, (255, 255, 255))
+        bgm_label_rect = bgm_label.get_rect(center=(window_width // 2, window_height // 2 - 80))
+        sfx_label = label_font.render("SFX", True, (255, 255, 255))
+        sfx_label_rect = sfx_label.get_rect(center=(window_width // 2, window_height // 2 + 20))
+        back_button_rect = pygame.Rect(window_width // 2 - 100, window_height - 100, 200, 50)
+        back_text = font.render("Back", True, (255, 255, 255))
+        setting_text = setting_text.render("Settings", True, (255, 255, 255))
+        setting_text_rect = setting_text.get_rect(center=(window_width // 2, 120))
+
+        running = True
+        while running:
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if back_button_rect.collidepoint(mouse_pos):
+                        running = False
+    
+            pygame_widgets.update(events)
+            bgm_value = bgm_slider.getValue() / 10.0 
+            sfx_value = sfx_slider.getValue() / 10.0  
+            bgm_volume = bgm_value
+            sound_volume = sfx_value
+            pygame.mixer.music.set_volume(bgm_volume) 
+            self.window.fill((30, 30, 30))
+            self.window.blit(overlay, (0, 0))
+            pygame.draw.rect(self.window, (100, 100, 100), back_button_rect)
+            self.window.blit(back_text, (back_button_rect.centerx - back_text.get_width() // 2, back_button_rect.centery - back_text.get_height() // 2))
+            self.window.blit(bgm_label, bgm_label_rect)
+            self.window.blit(sfx_label, sfx_label_rect)
+            self.window.blit(setting_text, setting_text_rect)
+            bgm_slider.draw()
+            sfx_slider.draw()
+            pygame.display.flip()
+
+    def pause_screen(self):
+        paused = True
+        game_snapshot = self.window.copy() 
+        overlay = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 128))  
         font = pygame.font.SysFont(None, 30)
         pause_font = pygame.font.SysFont(None, 80)
         pause_text = pause_font.render("Paused", True, (255, 255, 255))
-        self.window.blit(pause_text, (window_width // 2 - pause_text.get_width() // 2, 100))
 
         button_width, button_height = 200, 50
         resume_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 220, button_width, button_height)
         stage_select_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 290, button_width, button_height)
-        quit_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 360, button_width, button_height)
+        setting_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 360, button_width, button_height)
+        quit_button_rect = pygame.Rect(window_width // 2 - button_width // 2, 430, button_width, button_height)
 
         resume_text = font.render("Resume", True, (255, 255, 255))
         stage_select_text = font.render("Stage Select", True, (255, 255, 255))
+        setting_text = font.render("Settings", True, (255, 255, 255))
         quit_text = font.render("Quit", True, (255, 255, 255))
 
-        paused = True
         while paused:
+            self.window.blit(game_snapshot, (0, 0))
+            self.window.blit(overlay, (0, 0))
+            self.window.blit(pause_text, (window_width // 2 - pause_text.get_width() // 2, 100))
+            cursor_pos = pygame.mouse.get_pos()
+            for button_rect, text, color in [
+                (resume_button_rect, resume_text, (100, 100, 100) if resume_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (stage_select_button_rect, stage_select_text, (100, 100, 100) if stage_select_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (setting_button_rect, setting_text, (100, 100, 100) if setting_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+                (quit_button_rect, quit_text, (100, 100, 100) if quit_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
+            ]:
+                pygame.draw.rect(self.window, color, button_rect)
+                self.window.blit(text, (button_rect.centerx - text.get_width() // 2, button_rect.centery - text.get_height() // 2))
+
+            pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -565,30 +639,18 @@ class MainGameScreen:
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     if resume_button_rect.collidepoint(mouse_pos):
-                        paused = False
-                        return "resume"
+                        paused = False  
                     elif stage_select_button_rect.collidepoint(mouse_pos):
                         return "stage_select"
+                    elif setting_button_rect.collidepoint(mouse_pos):
+                        self.setting_screen() 
                     elif quit_button_rect.collidepoint(mouse_pos):
                         pygame.quit()
                         sys.exit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    paused = False
-            cursor_pos = pygame.mouse.get_pos()
-
-            self.window.fill((30, 30, 30)) 
-            self.window.blit(pause_text, (window_width // 2 - pause_text.get_width() // 2, 100))
-
-            for button_rect, text, color in [
-                (resume_button_rect, resume_text, (100, 100, 100) if resume_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
-                (stage_select_button_rect, stage_select_text, (100, 100, 100) if stage_select_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
-                (quit_button_rect, quit_text, (100, 100, 100) if quit_button_rect.collidepoint(cursor_pos) else (150, 150, 150)),
-            ]:
-                pygame.draw.rect(self.window, color, button_rect)
-                self.window.blit(text, (button_rect.centerx - text.get_width() // 2, button_rect.centery - text.get_height() // 2))
-            pygame.display.flip()
-
-
+                    paused = False 
+        self.pause = False
+        self.wave_pause = False
 
     def remove_health(self, health):
         self.health -= health
@@ -612,7 +674,6 @@ class MainGameScreen:
         self.money = money
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
-    # Debugging Functions
     def update_cursor_position(self):
         """Update and render the cursor position."""
         mouse_pos = pygame.mouse.get_pos()
@@ -654,6 +715,7 @@ def main():
             if stage_select.check_for_click():
                 selection = stage_select.return_selection()
                 if selection["stage"] and selection["difficulty"]:
+                    stage_select.reset_selection()
                     map = int(selection["stage"][-1])  
                     difficulty = selection["difficulty"]
                     game_state = 'main_game'
@@ -677,6 +739,8 @@ def main():
                         main_game_screen.pause = False
                     elif result == "stage_select":
                         game_state = 'stage_select'
+                        stage_select.selected_stage = None
+                        stage_select.selected_difficulty = None 
                         main_game_screen = None  
 
         for event in pygame.event.get():
