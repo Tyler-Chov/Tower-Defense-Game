@@ -486,8 +486,6 @@ class MainGameScreen:
                         return "stage_select"
                     return
 
-                    elif self.pause == False:
-                        self.pause = True
                 
                 # upgrade button functionality here
 
