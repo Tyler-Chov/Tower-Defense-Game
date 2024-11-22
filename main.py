@@ -18,6 +18,13 @@ pygame.display.set_caption('Tower Defense Game')
 pygame.init()
 window = pygame.display.set_mode((window_width, window_height))
 
+#define colours
+bg = (204, 102, 0)
+red = (255, 0, 0)
+black = (0, 0, 0)
+white = (255, 255, 255)
+green = (0, 180, 0)
+
 
 class StartScreen:
     """
@@ -320,17 +327,16 @@ class MainGameScreen:
         """Makes the rectangles for the health bar/box"""
        
         upgrade_boxes = [
-            Rectangle(5, 505, 340, 90, (100, 100, 100)),
-            Rectangle(355, 505, 340, 90, (100, 100, 100)),
+            Rectangle(5, 505, 290, 90, (100, 100, 100)),
+            Rectangle(305, 505, 290, 90, (100, 100, 100)),
+            Rectangle(600, 505, 100, 90, (100, 100, 100))
         ]
-        """Makes the rectangles for the upgrade boxes."""
-
-        upgrade_damage_button = text_button.Button(230, 540, 'Upgrade', window)
-        upgrade_cooldown_button = text_button.Button(580, 540, 'Upgrade', window)
-        upgrade_buttons = [
-            Rectangle(200, 525, 130, 50, (0, 180, 0)),
-            Rectangle(550, 525, 130, 50, (0, 180, 0)),
-        ]
+        """Makes the rectangles for the upgrade butons."""
+        
+        upgrade_damage_button = text_button.Button(180, 540, 100, 50, 'Upgrade', green, window)
+        upgrade_cooldown_button = text_button.Button(480, 540, 100, 50, 'Upgrade', green, window)
+        sell_button = text_button.Button(625, 525, 50, 50, "Sell", red, window)
+        """Makes the upgrade buttons"""
 
         tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
         """Loads tower image."""
@@ -344,9 +350,8 @@ class MainGameScreen:
         bottom_bar.draw()
         
         if self.selected_tower:
-            """Renders the attack radius of the selected tower."""
+            """Renders the attack radius and upgrade options of the selected tower."""
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
-            # Logic for upgrades and tower selection info should go here
             for box in upgrade_boxes:
                 box.draw()
             if upgrade_damage_button.draw_button():
@@ -358,6 +363,11 @@ class MainGameScreen:
                 if self.money >= 50:
                     self.selected_tower._shot_cooldown *= .75
                     self.remove_money(50)
+
+            if sell_button.draw_button():
+                self.add_money(self.selected_tower._sell_price)
+                self.selected_tower.sell_tower
+                # TODO - add logic for removing towers
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
             self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
             self.window.blit(self.attack_damage_text, (10, 510))
@@ -410,10 +420,7 @@ class MainGameScreen:
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
-        # for box in upgrade_boxes:
-            # """Draws each box in the upgrade_boxes list."""
-            # box.draw()
-            
+
         self.window.blit(tower_image, (705, 95))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
@@ -527,7 +534,7 @@ class MainGameScreen:
         if not self.check_collision(mouse_pos[0], mouse_pos[1]):
             if self.money < 200:
                 return
-            new_tower = Tower("Archer Tower", 20, 2, 1, 80, 1)
+            new_tower = Tower("Archer Tower", 20, 2, 200, 80, 1)
             # need to expand on this to allow for different towers
             new_tower.place(mouse_pos)
             self.placed_towers.append(new_tower)

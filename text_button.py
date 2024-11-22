@@ -19,17 +19,20 @@ counter = 0
 class Button():
         
     #colours for button and text
-    button_col = green
+    
     hover_col = (0, 225, 0)
     click_col = (0, 150, 0)
     text_col = white
     width = 100
     height = 50
-    def __init__(self, x, y, text, surface):
+    def __init__(self, x, y, width, height, text, color, surface):
         self.x = x
         self.y = y
+        self.width = width
+        self.height = height
         self.text = text
-
+        self.button_col = color
+        self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])
         self.surface = surface
 
     def draw_button(self):
