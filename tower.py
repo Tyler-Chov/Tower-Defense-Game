@@ -27,7 +27,7 @@ class Tower:
         self._damage = damage
         self._shot_cooldown = shot_cooldown * 60
         self._price = price
-        self._sell_price = price * 0.25
+        self._sell_price = int(price * 0.25)
         self._attack_range = attack_range
         self._attack_pattern = attack_pattern
         self._position = None
