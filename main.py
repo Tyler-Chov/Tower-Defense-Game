@@ -4,6 +4,7 @@ from enemy import Enemy
 from waves import Wave
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
+import text_button
 
 FPS = 60
 fpsClock = pygame.time.Clock()
@@ -81,6 +82,7 @@ class StartScreen:
                 if self.start_button_rect.collidepoint(mouse_pos):
                     return True
         return False
+
 
 class Stage_Select_Screen:
     def __init__(self, window):
@@ -172,6 +174,7 @@ class Stage_Select_Screen:
     def reset_selection(self):
         self.stage_selection = None
         self.difficulty_selection = None
+
 
 class MainGameScreen:
     """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
@@ -311,6 +314,24 @@ class MainGameScreen:
             Rectangle(705, 400, 90, 90, box_unselected_color)
         ]
         """Makes the rectangles for the tower boxes."""
+
+        health_box = Rectangle(5, 505, 680, 90, (100, 100, 100))
+        health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
+        """Makes the rectangles for the health bar/box"""
+       
+        upgrade_boxes = [
+            Rectangle(5, 505, 340, 90, (100, 100, 100)),
+            Rectangle(355, 505, 340, 90, (100, 100, 100)),
+        ]
+        """Makes the rectangles for the upgrade boxes."""
+
+        upgrade_damage_button = text_button.Button(230, 540, 'Upgrade', window)
+        upgrade_cooldown_button = text_button.Button(580, 540, 'Upgrade', window)
+        upgrade_buttons = [
+            Rectangle(200, 525, 130, 50, (0, 180, 0)),
+            Rectangle(550, 525, 130, 50, (0, 180, 0)),
+        ]
+
         tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
         """Loads tower image."""
         tower_image = pygame.transform.scale(tower_image, (90, 90))
@@ -319,12 +340,32 @@ class MainGameScreen:
         if self.grid_active:
             """Checks if grid is currently active, then renders a preview of the tower selected."""
             self.render_tower_preview()
-
+        
+        bottom_bar.draw()
+        
         if self.selected_tower:
             """Renders the attack radius of the selected tower."""
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
             # Logic for upgrades and tower selection info should go here
-
+            for box in upgrade_boxes:
+                box.draw()
+            if upgrade_damage_button.draw_button():
+                if self.money >= 50:
+                    self.selected_tower._damage *= 1.5
+                    self.remove_money(50)
+                
+            if upgrade_cooldown_button.draw_button():
+                if self.money >= 50:
+                    self.selected_tower._shot_cooldown *= .75
+                    self.remove_money(50)
+            self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
+            self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
+            self.window.blit(self.attack_damage_text, (10, 510))
+            self.window.blit(self.attack_cooldown_text, (370, 510))
+            
+        else:
+            health_box.draw()
+            health_bar.draw()
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
         """Renders the price of tower1."""
 
@@ -359,7 +400,6 @@ class MainGameScreen:
             self.update_attacks()
 
         # Display menu and UI
-        bottom_bar.draw()
         side_bar.draw()
         mouse_pos = pygame.mouse.get_pos()
         for box in tower_boxes:
@@ -370,7 +410,10 @@ class MainGameScreen:
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
-
+        # for box in upgrade_boxes:
+            # """Draws each box in the upgrade_boxes list."""
+            # box.draw()
+            
         self.window.blit(tower_image, (705, 95))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
@@ -403,6 +446,7 @@ class MainGameScreen:
 
                 # selecting towers.
                 tower_clicked = False
+                bottom_bar = pygame.rect.Rect(0, (window_height - 100), window_width, 100)
                 for tower in self.placed_towers:
                     tower_size = int(self.grid_size * self.tower_size * 0.8)
                     tower_rect = pygame.rect.Rect(
@@ -414,7 +458,7 @@ class MainGameScreen:
                         self.selected_tower = tower
                         tower_clicked = True
                         break
-                if not tower_clicked:
+                if not tower_clicked and not bottom_bar.collidepoint(mouse_pos):
                     self.selected_tower = None
 
                 # Wave Pause button functionality
@@ -435,11 +479,17 @@ class MainGameScreen:
                     if result == "resume":
                         self.wave_pause = False
                         self.pause = False
+
                         return
                     elif result == "stage_select":
                         self.return_to_stage_select = True
                         return "stage_select"
                     return
+
+                    elif self.pause == False:
+                        self.pause = True
+                
+                # upgrade button functionality here
 
             # Debug toggle button.
             elif event.type == pygame.KEYDOWN:
