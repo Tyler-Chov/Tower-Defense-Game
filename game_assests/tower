@@ -1,5 +1,6 @@
 import pygame
 import os
+from abc import ABC
 """
 Tower Class for Defense Tower Game
 
@@ -20,7 +21,7 @@ Attributes:
 """
 
 
-class Tower:
+class Tower(ABC):
     def __init__(self, name: str, damage: int, shot_cooldown: int, price: int, attack_range: int, attack_pattern: int):
         """Initializes the Tower with its primary attributes."""
         self._name = name
@@ -156,6 +157,350 @@ class Tower:
             "Upgrade Cost": self._upgrade_cost
         }
 
-# Example
-tower = Tower("Archer Tower", 50, 3, 100, 5, 1)
-print(tower.get_stats())
+
+class normal_tower(Tower):
+    pass
+
+
+class Archer_Tower(Tower):
+    def __init__(self):
+        """Initializes the Archer Tower with specific attributes."""
+        super().__init__(name="Archer Tower", damage=40, shot_cooldown=5, price=150, attack_range=100, attack_pattern=1)
+        self._upgrade_level = 1
+        self._upgrade_cost = self._price + (self._price * 0.25)
+        self._image = pygame.image.load(os.path.join('game_assests', "archer_tower.png"))
+
+    def attack(self, enemies):
+        """Specific implementation for archer_tower's attack logic."""
+        if self._cooldown_counter > 0:
+            self._cooldown_counter -= 1
+            return
+
+        for enemy in enemies:
+            if self._in_range(enemy):
+                enemy.take_damage(self._damage)
+                self._cooldown_counter = self._shot_cooldown
+                self._enemies_defeated += 1
+                break
+
+    def upgrade_tower(self):
+        """Upgrades the tower's attributes based on the level, elimination requirements, and upgrade cost."""
+        if self._upgrade_level == 1 and self._enemies_defeated >= 15:
+            if self._upgrade_cost <= self._price:
+                print("Level 2 Upgrade Options:")
+                print("1. +1 Damage")
+                print("2. +1 Range")
+                choice = input("Choose your upgrade (1 or 2): ")
+
+                if choice == "1":
+                    self._damage += 1
+                    print("Archer Tower upgraded: +1 damage")
+                elif choice == "2":
+                    self._attack_range += 1
+                    print("Archer Tower upgraded: +1 range")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + (self._price * 0.5)
+
+        elif self._upgrade_level == 2 and self._enemies_defeated >= 30:
+            if self._upgrade_cost <= self._price:
+                print("Level 3 Upgrade Options:")
+                print("1. +2 Damage")
+                print("2. +1 Range")
+                choice = input("Choose your upgrade (1 or 2): ")
+
+                if choice == "1":
+                    self._damage += 2
+                    print("Archer Tower upgraded: +2 damage")
+                elif choice == "2":
+                    self._attack_range += 1
+                    print("Archer Tower upgraded: +1 range")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + (self._price * 0.75)
+
+        elif self._upgrade_level == 3 and self._enemies_defeated >= 50:
+            if self._upgrade_cost <= self._price:
+                print("Level 4 Upgrade Options:")
+                print("1. +3 Damage")
+                print("2. +2 Range")
+                print("3. -1 Cooldown")
+                choice = input("Choose your upgrade (1, 2, or 3): ")
+
+                if choice == "1":
+                    self._damage += 3
+                    print("Archer Tower upgraded: +3 damage")
+                elif choice == "2":
+                    self._attack_range += 2
+                    print("Archer Tower upgraded: +2 range")
+                elif choice == "3":
+                    self._shot_cooldown = max(1, self._shot_cooldown - 1)
+                    print("Archer Tower upgraded: -1 cooldown")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + self._price
+
+        elif self._upgrade_level == 4 and self._enemies_defeated >= 80:
+            if self._upgrade_cost <= self._price:
+                print("Level 5 Upgrade Options:")
+                print("1. +4 Damage")
+                print("2. +3 Range")
+                print("3. -3 Cooldown")
+                choice = input("Choose your upgrade (1, 2, or 3): ")
+
+                if choice == "1":
+                    self._damage += 4
+                    print("Archer Tower upgraded: +4 damage")
+                elif choice == "2":
+                    self._attack_range += 3
+                    print("Archer Tower upgraded: +3 range")
+                elif choice == "3":
+                    self._shot_cooldown = max(1, self._shot_cooldown - 3)
+                    print("Archer Tower upgraded: -3 cooldown")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                print("Archer Tower reached Max Level!")
+        else:
+            print("Requirements not met, insufficient funds, or maximum level reached.")
+
+
+class cannon_tower(Tower):
+    def __init__(self):
+        """Initializes the Cannon Tower with specific attributes."""
+        super().__init__(name="Cannon Tower", damage=65, shot_cooldown=7, price=300, attack_range=50, attack_pattern=1)
+        self._upgrade_level = 1
+        self._upgrade_cost = self._price + (self._price * 0.25)
+        self._image = pygame.image.load(os.path.join('game_assests', "cannon_tower.png"))
+
+    def attack(self, enemies):
+        """Specific implementation for archer_tower's attack logic."""
+        if self._cooldown_counter > 0:
+            self._cooldown_counter -= 1
+            return
+
+        for enemy in enemies:
+            if self._in_range(enemy):
+                enemy.take_damage(self._damage)
+                self._cooldown_counter = self._shot_cooldown
+                self._enemies_defeated += 1
+                break
+
+    def upgrade_tower(self):
+        """Upgrades the tower's attributes based on the level, elimination requirements, and upgrade cost."""
+        if self._upgrade_level == 1 and self._enemies_defeated >= 30:
+            if self._upgrade_cost <= self._price:
+                print("Level 2 Upgrade Options:")
+                print("1. +1 Damage")
+                print("2. +1 Range")
+                choice = input("Choose your upgrade (1 or 2): ")
+
+                if choice == "1":
+                    self._damage += 1
+                    print("Cannon Tower upgraded: +1 damage")
+                elif choice == "2":
+                    self._attack_range += 1
+                    print("Cannon Tower upgraded: +1 range")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + (self._price * 0.5)
+
+        elif self._upgrade_level == 2 and self._enemies_defeated >= 55:
+            if self._upgrade_cost <= self._price:
+                print("Level 3 Upgrade Options:")
+                print("1. +1 Damage")
+                print("2. +2 Range")
+                choice = input("Choose your upgrade (1 or 2): ")
+
+                if choice == "1":
+                    self._damage += 1
+                    print("Cannon Tower upgraded: +2 damage")
+                elif choice == "2":
+                    self._attack_range += 2
+                    print("Cannon Tower upgraded: +1 range")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + (self._price * 0.75)
+
+        elif self._upgrade_level == 3 and self._enemies_defeated >= 50:
+            if self._upgrade_cost <= self._price:
+                print("Level 4 Upgrade Options:")
+                print("1. +2 Damage")
+                print("2. +3 Range")
+                print("3. -1 Cooldown")
+                choice = input("Choose your upgrade (1, 2, or 3): ")
+
+                if choice == "1":
+                    self._damage += 2
+                    print("Cannon Tower upgraded: +3 damage")
+                elif choice == "2":
+                    self._attack_range += 3
+                    print("Cannon Tower upgraded: +2 range")
+                elif choice == "3":
+                    self._shot_cooldown = max(1, self._shot_cooldown - 1)
+                    print("Cannon Tower upgraded: -1 cooldown")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + self._price
+
+        elif self._upgrade_level == 4 and self._enemies_defeated >= 80:
+            if self._upgrade_cost <= self._price:
+                print("Level 5 Upgrade Options:")
+                print("1. +4 Damage")
+                print("2. +3 Range")
+                print("3. -2 Cooldown")
+                choice = input("Choose your upgrade (1, 2, or 3): ")
+
+                if choice == "1":
+                    self._damage += 4
+                    print("Cannon Tower upgraded: +4 damage")
+                elif choice == "2":
+                    self._attack_range += 3
+                    print("Cannon Tower upgraded: +3 range")
+                elif choice == "3":
+                    self._shot_cooldown = max(1, self._shot_cooldown - 2)
+                    print("Cannon Tower upgraded: -3 cooldown")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                print("Cannon Tower reached Max Level!")
+        else:
+            print("Requirements not met, insufficient funds, or maximum level reached.")
+
+
+class slingshot_tower(Tower):
+    def __init__(self):
+        """Initializes the Slingshot Tower with specific attributes."""
+        super().__init__(name="Slingshot Tower", damage=50, shot_cooldown=8, price=500, attack_range=150, attack_pattern=1)
+        self._upgrade_level = 1
+        self._upgrade_cost = self._price + (self._price * 0.25)
+        self._image = pygame.image.load(os.path.join('game_assests', "slingshot_tower.png"))
+
+    def attack(self, enemies):
+        """Specific implementation for slingshot_tower's attack logic."""
+        if self._cooldown_counter > 0:
+            self._cooldown_counter -= 1
+            return
+
+        for enemy in enemies:
+            if self._in_range(enemy):
+                enemy.take_damage(self._damage)
+                self._cooldown_counter = self._shot_cooldown
+                self._enemies_defeated += 1
+                break
+
+    def upgrade_tower(self):
+        """Upgrades the tower's attributes based on the level, elimination requirements, and upgrade cost."""
+        if self._upgrade_level == 1 and self._enemies_defeated >= 20:
+            if self._upgrade_cost <= self._price:
+                print("Level 2 Upgrade Options:")
+                print("1. +1 Damage")
+                print("2. +1 Range")
+                choice = input("Choose your upgrade (1 or 2): ")
+
+                if choice == "1":
+                    self._damage += 1
+                    print("Slingshot Tower upgraded: +1 damage")
+                elif choice == "2":
+                    self._attack_range += 1
+                    print("Slingshot Tower upgraded: +1 range")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + (self._price * 0.5)
+
+        elif self._upgrade_level == 2 and self._enemies_defeated >= 55:
+            if self._upgrade_cost <= self._price:
+                print("Level 3 Upgrade Options:")
+                print("1. +2 Damage")
+                print("2. +1 Range")
+                choice = input("Choose your upgrade (1 or 2): ")
+
+                if choice == "1":
+                    self._damage += 2
+                    print("Slingshot Tower upgraded: +2 damage")
+                elif choice == "2":
+                    self._attack_range += 3
+                    print("Slingshot Tower upgraded: +1 range")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + (self._price * 0.75)
+
+        elif self._upgrade_level == 3 and self._enemies_defeated >= 50:
+            if self._upgrade_cost <= self._price:
+                print("Level 4 Upgrade Options:")
+                print("1. +3 Damage")
+                print("2. +2 Range")
+                print("3. -1 Cooldown")
+                choice = input("Choose your upgrade (1, 2, or 3): ")
+
+                if choice == "1":
+                    self._damage += 3
+                    print("Slingshot Tower upgraded: +3 damage")
+                elif choice == "2":
+                    self._attack_range += 2
+                    print("Slingshot Tower upgraded: +2 range")
+                elif choice == "3":
+                    self._shot_cooldown = max(1, self._shot_cooldown - 1)
+                    print("Slingshot Tower upgraded: -1 cooldown")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                self._upgrade_cost = self._price + self._price
+
+        elif self._upgrade_level == 4 and self._enemies_defeated >= 80:
+            if self._upgrade_cost <= self._price:
+                print("Level 5 Upgrade Options:")
+                print("1. +4 Damage")
+                print("2. +3 Range")
+                print("3. -2 Cooldown")
+                choice = input("Choose your upgrade (1, 2, or 3): ")
+
+                if choice == "1":
+                    self._damage += 4
+                    print("Slingshot Tower upgraded: +4 damage")
+                elif choice == "2":
+                    self._attack_range += 3
+                    print("Slingshot Tower upgraded: +3 range")
+                elif choice == "3":
+                    self._shot_cooldown = max(1, self._shot_cooldown - 2)
+                    print("Slingshot Tower upgraded: -3 cooldown")
+                else:
+                    print("Invalid choice. No upgrade applied.")
+                    return
+
+                self._upgrade_level += 1
+                print("Slingshot Tower reached Max Level!")
+        else:
+            print("Requirements not met, insufficient funds, or maximum level reached.")
+
+
