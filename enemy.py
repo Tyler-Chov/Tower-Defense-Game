@@ -1,16 +1,40 @@
-import pygame.draw
+import pygame.draw, os
 """pygame.draw used to more easily render enemies"""
 
 
 class Enemy:
     """Class that handles the creation of enemies"""
-    def __init__(self, e_type, health, speed, strength, path):
+    def __init__(self, e_type,  path):
         self._type = e_type
         """The type of enemy, to be used at a later date for different kinds of enemies"""
-        self._health = health
-        self._max_health = health
-        self._speed = speed
-        self._strength = strength
+        if e_type == 'circle':
+            self._speed = 1
+            self._strength = 1
+            self._health = 50
+            self._max_health = self._health
+            self._image = pygame.image.load(os.path.join("game_assests", "circle_ENEMY.png"))
+
+        if e_type == 'triangle':
+            self._speed = 5
+            self._strength = 1
+            self._health = 50
+            self._max_health = self._health
+            self._image = pygame.image.load(os.path.join("game_assests", "Triangle Enemy.png"))
+
+        if e_type == 'rectangle':
+            self._speed = 0.5
+            self._strength = 5
+            self._health = 200
+            self._max_health = self._health
+            self._image = pygame.image.load(os.path.join("game_assests", "Rectangle_Enemy.png"))
+
+        if e_type == 'ghost':
+            self._speed = 1
+            self._strength = 20
+            self._health = 1000
+            self._max_health = self._health
+            self._image = pygame.image.load(os.path.join("game_assests", "Ghost-Enemy.png"))
+
         self._path = path
         """The path the enemy is supposed to follow"""
         self._position = self._path[0]
@@ -18,7 +42,7 @@ class Enemy:
         self._path_index = 0
         self._status = True
         """Means the enemy is alive"""
-        self._resource_worth = health * 3
+        self._resource_worth = self._health
 
     def _move(self):
         """Function to move the enemy"""
@@ -81,8 +105,8 @@ class Enemy:
 
     def render(self, window):
         """Renders the enemy, currently as a circle. Plan to render as different shapes based on enemy type"""
-        pygame.draw.circle(window, (255, 0, 0),
-                           (int(self._position[0]), int(self._position[1])), 10)
+        x, y = int(self._position[0]), int(self._position[1])
+        window.blit(self._image, (x - self._image.get_width() // 2, y - self._image.get_height() // 2))
         self._draw_health_bar(window)
 
     def _draw_health_bar(self, window):
