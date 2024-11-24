@@ -32,7 +32,10 @@ class Button():
         self.height = height
         self.text = text
         self.button_col = color
-        self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])
+        if self.button_col[1] - 50 > 0:
+            self.hover_col = (self.button_col[0], (self.button_col[1] - 50), self.button_col[2])
+        else: 
+            self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])
         self.surface = surface
 
     def draw_button(self):
