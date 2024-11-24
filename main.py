@@ -354,24 +354,30 @@ class MainGameScreen:
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
             for box in upgrade_boxes:
                 box.draw()
+            
+            self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
+            self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
+            self.window.blit(self.attack_damage_text, (10, 510))
+            self.window.blit(self.attack_cooldown_text, (370, 510))
+
             if upgrade_damage_button.draw_button():
+                # self.selected_tower.upgrade_tower()
                 if self.money >= 50:
-                    self.selected_tower._damage *= 1.5
+                    self.selected_tower._damage = int(self.selected_tower._damage + 5)
                     self.remove_money(50)
                 
             if upgrade_cooldown_button.draw_button():
                 if self.money >= 50:
-                    self.selected_tower._shot_cooldown *= .75
+                    self.selected_tower._shot_cooldown = int(self.selected_tower._shot_cooldown * .75)
                     self.remove_money(50)
 
             if sell_button.draw_button():
                 self.add_money(self.selected_tower._sell_price)
                 self.selected_tower.sell_tower
                 # TODO - add logic for removing towers
-            self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
-            self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
-            self.window.blit(self.attack_damage_text, (10, 510))
-            self.window.blit(self.attack_cooldown_text, (370, 510))
+                self.placed_towers.remove(self.selected_tower)
+                self.selected_tower._position = None
+                self.selected_tower = None
             
         else:
             health_box.draw()
@@ -544,6 +550,11 @@ class MainGameScreen:
         else:
             #print("Cannot place the tower here. Collision detected.")
             pass
+
+        """def remove_tower(self):
+            self.paced_towers.remove(tower)
+            self.tower._position = None"""
+        
     def check_collision(self, x, y):
         preview_size = self.grid_size * self.tower_size
 
@@ -714,7 +725,7 @@ class MainGameScreen:
             self.game_over()
 
     def add_money(self, money):
-        self.money += money
+        self.money += int(money)
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
     def remove_money(self, money):
