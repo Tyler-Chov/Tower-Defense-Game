@@ -11,6 +11,7 @@ red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 180, 0)
+grey = 100, 100, 100
 
 #define global variable
 clicked = False
@@ -32,12 +33,23 @@ class Button():
         self.height = height
         self.text = text
         self.button_col = color
-        if self.button_col[1] - 50 > 0:
+        """if self.button_col[1] - 50 > 0:
             self.hover_col = (self.button_col[0], (self.button_col[1] - 50), self.button_col[2])
         else: 
-            self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])
+            self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])"""
         self.surface = surface
+        self.hover_col = self.darken(color)
 
+    def darken(self, color):
+        if color == black:
+            return grey
+        new_color = []
+        for i in range (3):
+            new_color.append(color[i])
+            if color[i] >= 50:
+                new_color[i] = color[i] - 50
+        return new_color
+                
     def draw_button(self):
 
         global clicked
@@ -73,3 +85,5 @@ class Button():
         text_len = text_img.get_width()
         self.surface.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 25))
         return action
+"""window = pygame.display.set_mode((600, 800))
+upgrade_damage_button = Button(180, 540, 100, 50, 'Upgrade', green, window)"""

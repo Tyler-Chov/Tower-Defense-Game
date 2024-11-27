@@ -24,6 +24,7 @@ red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 180, 0)
+grey = (100, 100, 100)
 
 
 class StartScreen:
@@ -203,7 +204,8 @@ class MainGameScreen:
         # Wave Pause button
         wave_pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         """The image of the pause button."""
-        self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
+        # self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
+        self.wave_pause_button = text_button.Button(710, 510, 75, 75, "pause", grey, window)
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
 
         self.game_pause_img = pygame.image.load(os.path.join('game_assests', 'pause.png'))
@@ -432,7 +434,7 @@ class MainGameScreen:
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
-        self.wave_pause_button.draw(window)
+        self.wave_pause_button.draw_button()
         self.window.blit(self.game_pause_img, (10, 10))
         pygame.display.update()
 
