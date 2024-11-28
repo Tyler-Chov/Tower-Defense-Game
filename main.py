@@ -198,7 +198,7 @@ class MainGameScreen:
         """Renders the health text so the player knows how much health they have remaining."""
         self.money = 0
         """Holds the amount of money the player has"""
-        self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
+        self.money_text = self.font.render(f'Money: {int(self.money)}', True, (255, 255, 255))
         """Renders the money text so the player knows how much money they have remaining."""
 
         # Wave Pause button
