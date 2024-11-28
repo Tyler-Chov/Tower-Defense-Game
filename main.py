@@ -1,5 +1,5 @@
 import pygame, sys, os, button, pygame_widgets
-from tower import Tower
+from tower import Archer_Tower, cannon_tower, slingshot_tower, normal_tower
 from enemy import Enemy
 from waves import Wave
 from pygame_widgets.slider import Slider
@@ -216,6 +216,7 @@ class MainGameScreen:
         """Sets pause to True when initially ran."""
         self.map = map
         self.return_to_stage_select = False
+    
 
         # Map Variables
         if self.map == 1:
@@ -246,6 +247,7 @@ class MainGameScreen:
         self.tower_size = 3
         """Determines the tower size"""
         self.selected_tower = None
+        self.selected_tower_type = None
         """Determines which tower the player has selected."""
         self.placed_towers = []
         """A list to hold all the towers that have been placed."""
@@ -337,10 +339,18 @@ class MainGameScreen:
         ]
         """Makes the rectangles for the upgrade butons."""
 
-        tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
+        normal_tower_image = pygame.image.load(os.path.join("game_assests", "Basic_Tower.png"))
         """Loads tower image."""
-        tower_image = pygame.transform.scale(tower_image, (90, 90))
+        normal_towertower_image = pygame.transform.scale(normal_tower_image, (90, 90))
         """Scales tower image."""
+        Archer_Tower_image = pygame.image.load(os.path.join("game_assests", "Archer_Tower.png"))
+        Archer_Tower_image = pygame.transform.scale(Archer_Tower_image, (90, 90))
+
+        slingshot_tower_image = pygame.image.load(os.path.join("game_assests", "Slingshot_Tower.png"))
+        slingshot_tower_image = pygame.transform.scale(slingshot_tower_image, (90, 90))
+        
+        cannon_tower_image = pygame.image.load(os.path.join("game_assests", "Cannon_Tower.png"))
+        cannon_tower_image = pygame.transform.scale(cannon_tower_image, (90, 90))
 
         if self.grid_active:
             """Checks if grid is currently active, then renders a preview of the tower selected."""
@@ -442,7 +452,10 @@ class MainGameScreen:
             """Draws each box in the tower_boxes list."""
             box.draw()
 
-        self.window.blit(tower_image, (705, 95))
+        self.window.blit(normal_tower_image, (717, 100))
+        self.window.blit(Archer_Tower_image, (705, 195))
+        self.window.blit(slingshot_tower_image, (705, 295))
+        self.window.blit(cannon_tower_image, (710, 395))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
@@ -467,9 +480,10 @@ class MainGameScreen:
                     pygame.Rect(705, 300, 90, 90),
                     pygame.Rect(705, 400, 90, 90)
                 ]
-                for box in tower_boxes:
+                for i, box in enumerate(tower_boxes):
                     if box.collidepoint(mouse_pos):
                         self.grid_active = not self.grid_active
+                        self.selected_tower_type = i
                         return
                 if self.grid_active:
                     self.place_tower(mouse_pos)
@@ -540,7 +554,14 @@ class MainGameScreen:
 
     def render_tower_preview(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        temp_tower = Tower("Archer Tower", 50, 3, 100, 80, 1)
+        if self.selected_tower_type == 0:
+            temp_tower = normal_tower()
+        elif self.selected_tower_type == 1:
+            temp_tower = Archer_Tower()
+        elif self.selected_tower_type == 2:
+            temp_tower = slingshot_tower()
+        elif self.selected_tower_type == 3:
+            temp_tower = cannon_tower()
         if self.check_collision(mouse_x, mouse_y):
             color = (255, 0, 0, 100)
         else:
@@ -556,15 +577,27 @@ class MainGameScreen:
 
     def place_tower(self, mouse_pos):
         if not self.check_collision(mouse_pos[0], mouse_pos[1]):
-            if self.money < 200:
-                return
-            new_tower = Tower("Archer Tower", 20, 2, 200, 80, 1)
+            if self.selected_tower_type == 0:
+                new_tower = normal_tower()
+            elif self.selected_tower_type == 1:
+                new_tower = Archer_Tower()
+            elif self.selected_tower_type == 2:
+                new_tower = slingshot_tower()
+            elif self.selected_tower_type == 3:
+                new_tower = cannon_tower()
+            if self.money >= new_tower.get_price():
+                new_tower.place(mouse_pos)
+                self.placed_towers.append(new_tower)
+                self.grid_active = False
+                self.remove_money(new_tower.get_price())
+            else:
+                self.grid_active = False
+                self.selected_tower = False
             # need to expand on this to allow for different towers
             new_tower.place(mouse_pos)
             self.placed_towers.append(new_tower)
             self.grid_active = False
             self.selected_tower = False
-            self.remove_money(200)
         else:
             #print("Cannot place the tower here. Collision detected.")
             pass

@@ -159,16 +159,21 @@ class Tower(ABC):
 
 
 class normal_tower(Tower):
-    pass
+    def __init__(self):
+        """Initializes the Normal Tower with specific attributes."""
+        super().__init__(name="Normal Tower", damage=30, shot_cooldown=3, price=200, attack_range=75, attack_pattern=1)
+        self._upgrade_level = 1
+        self._upgrade_cost = self._price + (self._price * 0.25)
+        self._image = pygame.image.load(os.path.join('game_assests', "Basic_Tower.png"))
 
 
 class Archer_Tower(Tower):
     def __init__(self):
         """Initializes the Archer Tower with specific attributes."""
-        super().__init__(name="Archer Tower", damage=40, shot_cooldown=5, price=150, attack_range=100, attack_pattern=1)
+        super().__init__(name="Archer Tower", damage=40, shot_cooldown=6, price=150, attack_range=100, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
-        self._image = pygame.image.load(os.path.join('game_assests', "archer_tower.png"))
+        self._image = pygame.image.load(os.path.join('game_assests', "Archer_Tower.png"))
 
     def attack(self, enemies):
         """Specific implementation for archer_tower's attack logic."""
