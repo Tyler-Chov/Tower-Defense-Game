@@ -140,6 +140,7 @@ class Tower(ABC):
                     target=enemy,
                     speed=10,  
                     damage=self._damage,
+                    size = 32,
                     image_path=self.projectile_image
                 )
                 projectiles_list.append(projectile)
@@ -169,7 +170,7 @@ class Tower(ABC):
 class normal_tower(Tower):
     def __init__(self):
         """Initializes the Normal Tower with specific attributes."""
-        super().__init__(name="Normal Tower", damage=30, shot_cooldown=3, price=200, attack_range=75, attack_pattern=1)
+        super().__init__(name="Normal Tower", damage=30, shot_cooldown=4, price=200, attack_range=75, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "Basic_Tower.png"))
@@ -178,7 +179,7 @@ class normal_tower(Tower):
 class Archer_Tower(Tower):
     def __init__(self):
         """Initializes the Archer Tower with specific attributes."""
-        super().__init__(name="Archer Tower", damage=40, shot_cooldown=6, price=150, attack_range=100, attack_pattern=1)
+        super().__init__(name="Archer Tower", damage=20, shot_cooldown=2, price=150, attack_range=60, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "Archer_Tower.png"))
@@ -196,6 +197,7 @@ class Archer_Tower(Tower):
                     target=enemy,
                     speed=10,  
                     damage=self._damage,
+                    size = 30,
                     image_path=self.projectile_image
                 )
                 projectiles_list.append(projectile)
@@ -298,7 +300,7 @@ class Archer_Tower(Tower):
 class cannon_tower(Tower):
     def __init__(self):
         """Initializes the Cannon Tower with specific attributes."""
-        super().__init__(name="Cannon Tower", damage=65, shot_cooldown=7, price=300, attack_range=70, attack_pattern=1)
+        super().__init__(name="Cannon Tower", damage=40, shot_cooldown=7, price=300, attack_range=70, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "cannon_tower.png"))
@@ -315,10 +317,11 @@ class cannon_tower(Tower):
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
-                    speed=5, 
+                    speed=7, 
                     damage=self._damage,
+                    size = 60,
                     image_path=self.projectile_image,
-                    AoE_radius= 40
+                    AoE_radius= 70
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
@@ -420,7 +423,7 @@ class cannon_tower(Tower):
 class slingshot_tower(Tower):
     def __init__(self):
         """Initializes the Slingshot Tower with specific attributes."""
-        super().__init__(name="Slingshot Tower", damage=50, shot_cooldown=8, price=500, attack_range=150, attack_pattern=1)
+        super().__init__(name="Slingshot Tower", damage=80, shot_cooldown=8, price=500, attack_range=150, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "slingshot_tower.png"))
@@ -438,6 +441,7 @@ class slingshot_tower(Tower):
                     target=enemy,
                     speed=10,  
                     damage=self._damage,
+                    size = 32,
                     image_path=self.projectile_image
                 )
                 projectiles_list.append(projectile)

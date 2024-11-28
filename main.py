@@ -114,6 +114,7 @@ class Stage_Select_Screen:
 
         self.click_sound = pygame.mixer.Sound(os.path.join('game_assests/sounds', 'click.mp3'))
         self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+
     def render(self):
         self.window.blit(self.background, (0, 0))
         if self.hovered_stage == "stage1" or self.stage_selection == "stage1":
@@ -218,7 +219,7 @@ class MainGameScreen:
         self.map = map
         self.return_to_stage_select = False
         self.projectiles = []
-
+        self.explosions = []
         # Map Variables
         if self.map == 1:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
@@ -276,7 +277,7 @@ class MainGameScreen:
                 Enemy('circle', enemy_hp, speed, 1, self.map_path) for i in range(enemy_count)
             ]
             """Generate wave data, to be added to self._waves"""
-            self._waves.append(Wave(wave_data, 20))
+            self._waves.append(Wave(wave_data, 60))
 
             # Debugging Variables
         self.debug = False
@@ -446,8 +447,15 @@ class MainGameScreen:
                 projectile.move()
                 projectile.render(self.window)
             else:
-                projectile.apply_splash_damage(self._enemy_list)
+                projectile.apply_splash_damage(self._enemy_list, self.explosions)
                 self.projectiles.remove(projectile)
+
+        for explosion in self.explosions[:]:
+            if explosion.is_active():
+                explosion.update()
+                explosion.render(self.window)
+            else:
+                self.explosions.remove(explosion)
 
         # Display menu and UI
         side_bar.draw()
