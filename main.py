@@ -464,8 +464,8 @@ class MainGameScreen:
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
         self.window.blit(self.archer_price, (731, 267))
-        self.window.blit(self.cannon_price, (731, 367))
-        self.window.blit(self.slingshot_price, (731, 467))
+        self.window.blit(self.cannon_price, (731, 467))
+        self.window.blit(self.slingshot_price, (731, 367))
         if self.wave_pause == False:
             self.wave_pause_button.draw_button()
         if self.wave_pause == True:
