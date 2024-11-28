@@ -1,6 +1,7 @@
 import pygame
 import os
 from abc import ABC
+from projectile import Projectile
 """
 Tower Class for Defense Tower Game
 
@@ -38,6 +39,7 @@ class Tower(ABC):
         self._cooldown_counter = 0
         self._image = pygame.image.load(os.path.join('game_assests', "tower.png"))
         self.size = 28
+        self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
 
     def render(self, window):
         """Draws the tower image on the game window at its position."""
@@ -126,16 +128,22 @@ class Tower(ABC):
         """Displays a message indicating the tower has been sold."""
         print(f"{self._name} tower sold for {self._sell_price} credits.")
 
-    def attack(self, enemies):
+    def attack(self, enemies, projectiles_list):
         """Attacks the first enemy within range if the tower is not on cooldown."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
             return
         for enemy in enemies:
             if self._in_range(enemy):
-                enemy.take_damage(self._damage)
+                projectile = Projectile(
+                    position=self._position,
+                    target=enemy,
+                    speed=10,  
+                    damage=self._damage,
+                    image_path=self.projectile_image
+                )
+                projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
-                self._enemies_defeated += 1
                 break
 
     def _in_range(self, enemy):
@@ -165,8 +173,8 @@ class normal_tower(Tower):
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "Basic_Tower.png"))
-
-
+        self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+    
 class Archer_Tower(Tower):
     def __init__(self):
         """Initializes the Archer Tower with specific attributes."""
@@ -175,7 +183,7 @@ class Archer_Tower(Tower):
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "Archer_Tower.png"))
 
-    def attack(self, enemies):
+    def attack(self, enemies, projectiles_list):
         """Specific implementation for archer_tower's attack logic."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
@@ -183,9 +191,15 @@ class Archer_Tower(Tower):
 
         for enemy in enemies:
             if self._in_range(enemy):
-                enemy.take_damage(self._damage)
+                projectile = Projectile(
+                    position=self._position,
+                    target=enemy,
+                    speed=10,  
+                    damage=self._damage,
+                    image_path=self.projectile_image
+                )
+                projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
-                self._enemies_defeated += 1
                 break
 
     def upgrade_tower(self):
@@ -284,12 +298,13 @@ class Archer_Tower(Tower):
 class cannon_tower(Tower):
     def __init__(self):
         """Initializes the Cannon Tower with specific attributes."""
-        super().__init__(name="Cannon Tower", damage=65, shot_cooldown=7, price=300, attack_range=50, attack_pattern=1)
+        super().__init__(name="Cannon Tower", damage=65, shot_cooldown=7, price=300, attack_range=70, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "cannon_tower.png"))
+        self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
 
-    def attack(self, enemies):
+    def attack(self, enemies, projectiles_list):
         """Specific implementation for archer_tower's attack logic."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
@@ -297,9 +312,16 @@ class cannon_tower(Tower):
 
         for enemy in enemies:
             if self._in_range(enemy):
-                enemy.take_damage(self._damage)
+                projectile = Projectile(
+                    position=self._position,
+                    target=enemy,
+                    speed=5, 
+                    damage=self._damage,
+                    image_path=self.projectile_image,
+                    AoE_radius= 40
+                )
+                projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
-                self._enemies_defeated += 1
                 break
 
     def upgrade_tower(self):
@@ -402,8 +424,8 @@ class slingshot_tower(Tower):
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "slingshot_tower.png"))
-
-    def attack(self, enemies):
+        self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+    def attack(self, enemies, projectiles_list):
         """Specific implementation for slingshot_tower's attack logic."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
@@ -411,9 +433,15 @@ class slingshot_tower(Tower):
 
         for enemy in enemies:
             if self._in_range(enemy):
-                enemy.take_damage(self._damage)
+                projectile = Projectile(
+                    position=self._position,
+                    target=enemy,
+                    speed=10,  
+                    damage=self._damage,
+                    image_path=self.projectile_image
+                )
+                projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
-                self._enemies_defeated += 1
                 break
 
     def upgrade_tower(self):

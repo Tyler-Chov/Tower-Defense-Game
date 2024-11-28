@@ -2,6 +2,7 @@ import pygame, sys, os, button, pygame_widgets
 from tower import Archer_Tower, cannon_tower, slingshot_tower, normal_tower
 from enemy import Enemy
 from waves import Wave
+from projectile import Projectile
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 import text_button
@@ -216,7 +217,7 @@ class MainGameScreen:
         """Sets pause to True when initially ran."""
         self.map = map
         self.return_to_stage_select = False
-    
+        self.projectiles = []
 
         # Map Variables
         if self.map == 1:
@@ -275,7 +276,7 @@ class MainGameScreen:
                 Enemy('circle', enemy_hp, speed, 1, self.map_path) for i in range(enemy_count)
             ]
             """Generate wave data, to be added to self._waves"""
-            self._waves.append(Wave(wave_data, 60))
+            self._waves.append(Wave(wave_data, 20))
 
             # Debugging Variables
         self.debug = False
@@ -439,6 +440,14 @@ class MainGameScreen:
                         self.remove_health(enemy._strength)
                         self.remove_money(enemy._resource_worth)
             self.update_attacks()
+        
+        for projectile in self.projectiles[:]:
+            if projectile.is_active():
+                projectile.move()
+                projectile.render(self.window)
+            else:
+                projectile.apply_splash_damage(self._enemy_list)
+                self.projectiles.remove(projectile)
 
         # Display menu and UI
         side_bar.draw()
@@ -635,7 +644,7 @@ class MainGameScreen:
 
     def update_attacks(self):
         for tower in self.placed_towers:
-            tower.attack(self._enemy_list)
+            tower.attack(self._enemy_list, self.projectiles)
         for enemy in self._enemy_list:
             if not enemy.is_alive():
                 self.add_money(enemy._resource_worth)
