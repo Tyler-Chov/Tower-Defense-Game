@@ -364,8 +364,8 @@ class MainGameScreen:
             for box in upgrade_boxes:
                 box.draw()
             
-            upgrade_damage_button = text_button.Button(210, 540, 180, 50, (f"Upgrade for: ${self.selected_tower._upgrade_cost}"), green, window)
-            upgrade_cooldown_button = text_button.Button(410, 540, 180, 50, (f"Upgrade for: ${self.selected_tower._upgrade_cost}"), green, window)
+            upgrade_damage_button = text_button.Button(210, 540, 180, 50, (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"), green, window)
+            upgrade_cooldown_button = text_button.Button(410, 540, 180, 50, (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"), green, window)
             sell_button = text_button.Button(605, 540, 90, 50, (f"Sell"), red, window)
             image = self.selected_tower._image
             width = image.get_width()
@@ -392,22 +392,25 @@ class MainGameScreen:
                     self.remove_money(self.selected_tower._upgrade_cost)
                 
             if upgrade_cooldown_button.draw_button():
-                if self.money >= self.selected_tower._upgrade_cost:
+                if self.money >= (int(self.selected_tower._upgrade_cost)):
                     self.selected_tower._shot_cooldown = int(self.selected_tower._shot_cooldown * .75)
-                    self.remove_money(self.selected_tower._upgrade_cost)
+                    self.remove_money(int(self.selected_tower._upgrade_cost))
 
             if sell_button.draw_button():
                 self.add_money(self.selected_tower._sell_price)
                 self.selected_tower.sell_tower
                 # TODO - add logic for removing towers
                 self.placed_towers.remove(self.selected_tower)
-                self.selected_tower._position = None
+                self.selected_tower._position = (900, 900)
                 self.selected_tower = None
             
         else:
             health_box.draw()
             # health_bar.draw()
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
+        self.archer_price = self.font.render(f'$150', True, (255, 255, 255))
+        self.slingshot_price = self.font.render(f'$500', True, (255, 255, 255))
+        self.cannon_price = self.font.render(f'$300', True, (255, 255, 255))
         """Renders the price of tower1."""
 
         for tower in self.placed_towers:
@@ -460,6 +463,9 @@ class MainGameScreen:
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
+        self.window.blit(self.archer_price, (731, 267))
+        self.window.blit(self.cannon_price, (731, 367))
+        self.window.blit(self.slingshot_price, (731, 467))
         if self.wave_pause == False:
             self.wave_pause_button.draw_button()
         if self.wave_pause == True:
