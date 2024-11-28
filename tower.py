@@ -28,12 +28,12 @@ class Tower(ABC):
         self._damage = damage
         self._shot_cooldown = shot_cooldown * 60
         self._price = price
-        self._sell_price = price * 0.25
+        self._sell_price = int(price * 0.25)
         self._attack_range = attack_range
         self._attack_pattern = attack_pattern
         self._position = None
         self._upgrade_level = 1
-        self._upgrade_cost = price + (price * 0.5)
+        self._upgrade_cost = int(price + (price * 0.5))
         self._enemies_defeated = 0
         self._cooldown_counter = 0
         self._image = pygame.image.load(os.path.join('game_assests', "tower.png"))

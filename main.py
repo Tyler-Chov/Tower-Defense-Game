@@ -24,6 +24,7 @@ red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 180, 0)
+grey = (100, 100, 100)
 
 
 class StartScreen:
@@ -203,7 +204,9 @@ class MainGameScreen:
         # Wave Pause button
         wave_pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         """The image of the pause button."""
-        self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
+        # self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
+        self.wave_pause_button = text_button.Button(710, 510, 75, 75, "pause", grey, window)
+        self.wave_play_button = text_button.Button(710, 510, 75, 75, "play", grey, window)
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
 
         self.game_pause_img = pygame.image.load(os.path.join('game_assests', 'pause.png'))
@@ -323,20 +326,16 @@ class MainGameScreen:
         """Makes the rectangles for the tower boxes."""
 
         health_box = Rectangle(5, 505, 680, 90, (100, 100, 100))
-        health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
+        # health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
         """Makes the rectangles for the health bar/box"""
        
         upgrade_boxes = [
-            Rectangle(5, 505, 290, 90, (100, 100, 100)),
-            Rectangle(305, 505, 290, 90, (100, 100, 100)),
+            Rectangle(5, 505, 190, 90, (100, 100, 100)),
+            Rectangle(200, 505, 195, 90, (100, 100, 100)),
+            Rectangle(400, 505, 195, 90, (100, 100, 100)),
             Rectangle(600, 505, 100, 90, (100, 100, 100))
         ]
         """Makes the rectangles for the upgrade butons."""
-        
-        upgrade_damage_button = text_button.Button(180, 540, 100, 50, 'Upgrade', green, window)
-        upgrade_cooldown_button = text_button.Button(480, 540, 100, 50, 'Upgrade', green, window)
-        sell_button = text_button.Button(625, 525, 50, 50, "Sell", red, window)
-        """Makes the upgrade buttons"""
 
         tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
         """Loads tower image."""
@@ -355,21 +354,37 @@ class MainGameScreen:
             for box in upgrade_boxes:
                 box.draw()
             
+            upgrade_damage_button = text_button.Button(210, 540, 180, 50, (f"Upgrade for: ${self.selected_tower._upgrade_cost}"), green, window)
+            upgrade_cooldown_button = text_button.Button(410, 540, 180, 50, (f"Upgrade for: ${self.selected_tower._upgrade_cost}"), green, window)
+            sell_button = text_button.Button(605, 540, 90, 50, (f"Sell"), red, window)
+            image = self.selected_tower._image
+            width = image.get_width()
+            height = image.get_height()
+            scale = 1.5
+            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+
+            self.name_text = self.font.render(f"{self.selected_tower._name}", True, (255, 255, 255))
+            self.enemys_defeated_text = self.font.render(f"Enemies Defeated: {self.selected_tower._enemies_defeated}", True, (255, 255, 255))
+            self.sell_price_text = self.font.render(f"Sell Price: {self.selected_tower._sell_price}", True, (255, 255, 255))
             self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
             self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
-            self.window.blit(self.attack_damage_text, (10, 510))
-            self.window.blit(self.attack_cooldown_text, (370, 510))
-
+            self.window.blit(self.attack_damage_text, (210, 510))
+            self.window.blit(self.attack_cooldown_text, (410, 510))
+            self.window.blit(self.name_text, (10, 510))
+            self.window.blit(self.image, (10, 520))
+            self.window.blit(self.enemys_defeated_text, (10, 580))
+            self.window.blit(self.sell_price_text, (605, 510))
             if upgrade_damage_button.draw_button():
                 # self.selected_tower.upgrade_tower()
-                if self.money >= 50:
+                
+                if self.money >= self.selected_tower._upgrade_cost:
                     self.selected_tower._damage = int(self.selected_tower._damage + 5)
-                    self.remove_money(50)
+                    self.remove_money(self.selected_tower._upgrade_cost)
                 
             if upgrade_cooldown_button.draw_button():
-                if self.money >= 50:
+                if self.money >= self.selected_tower._upgrade_cost:
                     self.selected_tower._shot_cooldown = int(self.selected_tower._shot_cooldown * .75)
-                    self.remove_money(50)
+                    self.remove_money(self.selected_tower._upgrade_cost)
 
             if sell_button.draw_button():
                 self.add_money(self.selected_tower._sell_price)
@@ -381,7 +396,7 @@ class MainGameScreen:
             
         else:
             health_box.draw()
-            health_bar.draw()
+            # health_bar.draw()
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
         """Renders the price of tower1."""
 
@@ -432,7 +447,10 @@ class MainGameScreen:
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
-        self.wave_pause_button.draw(window)
+        if self.wave_pause == False:
+            self.wave_pause_button.draw_button()
+        if self.wave_pause == True:
+            self.wave_play_button.draw_button()
         self.window.blit(self.game_pause_img, (10, 10))
         pygame.display.update()
 
