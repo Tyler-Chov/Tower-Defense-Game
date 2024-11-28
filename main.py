@@ -437,10 +437,10 @@ class MainGameScreen:
             """Draws each box in the tower_boxes list."""
             box.draw()
 
-        self.window.blit(normal_tower_image, (705, 95))
+        self.window.blit(normal_tower_image, (717, 100))
         self.window.blit(Archer_Tower_image, (705, 195))
         self.window.blit(slingshot_tower_image, (705, 295))
-        self.window.blit(cannon_tower_image, (705, 395))
+        self.window.blit(cannon_tower_image, (710, 395))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
@@ -567,12 +567,19 @@ class MainGameScreen:
                 new_tower = slingshot_tower()
             elif self.selected_tower_type == 3:
                 new_tower = cannon_tower()
+            if self.money >= new_tower.get_price():
+                new_tower.place(mouse_pos)
+                self.placed_towers.append(new_tower)
+                self.grid_active = False
+                self.remove_money(new_tower.get_price())
+            else:
+                self.grid_active = False
+                self.selected_tower = False
             # need to expand on this to allow for different towers
             new_tower.place(mouse_pos)
             self.placed_towers.append(new_tower)
             self.grid_active = False
             self.selected_tower = False
-            self.remove_money(200)
         else:
             #print("Cannot place the tower here. Collision detected.")
             pass
