@@ -39,6 +39,7 @@ class Button():
             self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])"""
         self.surface = surface
         self.hover_col = self.darken(color)
+        self.click_col = self.hover_col
 
     def darken(self, color):
         if color == black:
@@ -47,7 +48,7 @@ class Button():
         for i in range (3):
             new_color.append(color[i])
             if color[i] >= 50:
-                new_color[i] = color[i] - 50
+                new_color[i] = color[i] - 25
         return new_color
                 
     def draw_button(self):
@@ -60,6 +61,7 @@ class Button():
 
         #create pygame Rect object for the button
         button_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        # button_rect.set_alpha(90)
         
         #check mouseover and clicked conditions
         if button_rect.collidepoint(pos):
