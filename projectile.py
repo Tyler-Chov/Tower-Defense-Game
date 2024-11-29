@@ -1,6 +1,6 @@
 import pygame
 import os
-
+import math
 
 class Projectile:
     def __init__(self, position, target, speed, damage, size, image_path="game_assests/projectile.png", AoE_radius = 0, ):
@@ -9,7 +9,9 @@ class Projectile:
         self._speed = speed
         self._damage = damage
         self._active = True
-        self._image = image_path
+        self._original_image = image_path
+        self._current_image = self._original_image
+        self._scaled_image = pygame.transform.scale(self._original_image, (size, size))
         self._AoE_radius = AoE_radius
         self._size = size
         self._explosions = []
@@ -31,6 +33,9 @@ class Projectile:
         else:  
             self._position[0] += dir_x / distance * self._speed
             self._position[1] += dir_y / distance * self._speed
+    
+        angle = math.degrees (math.atan2(-dir_y, dir_x))
+        self._current_image = pygame.transform.rotate(self._scaled_image, int(angle))
 
     def apply_splash_damage(self, enemies, explosions_list):
         if self._AoE_radius > 0:
@@ -44,8 +49,8 @@ class Projectile:
             explosions_list.append(explosion)
 
     def render(self, window):
-        scaled_image = pygame.transform.scale(self._image, (self._size, self._size))
-        window.blit(scaled_image, (self._position[0] - self._size // 2, self._position[1] - self._size // 2))
+        rotated_rect = self._current_image.get_rect(center=(self._position[0], self._position[1]))
+        window.blit(self._current_image, rotated_rect.topleft)
 
     def is_active(self):
         return self._active
