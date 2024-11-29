@@ -434,7 +434,7 @@ class cannon_tower(Tower):
 class slingshot_tower(Tower):
     def __init__(self):
         """Initializes the Slingshot Tower with specific attributes."""
-        super().__init__(name="Slingshot Tower", damage=80, shot_cooldown=8, price=500, attack_range=150, attack_pattern=1)
+        super().__init__(name="Slingshot Tower", damage=80, shot_cooldown=7, price=400, attack_range=150, attack_pattern=1)
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "slingshot_tower.png"))
