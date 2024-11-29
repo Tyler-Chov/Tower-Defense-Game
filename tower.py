@@ -40,13 +40,17 @@ class Tower(ABC):
         self._image = pygame.image.load(os.path.join('game_assests', "tower.png"))
         self.size = 28
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+        self._flipped_image = pygame.transform.flip(self._image, True, False)
+        self._is_facing_left = False
+
 
     def render(self, window):
         """Draws the tower image on the game window at its position."""
         if self._position:
             adjusted_x = self._position[0] - (self.size * 3) // 2
             adjusted_y = self._position[1] - (self.size * 3) // 2
-            tower_surface = pygame.transform.scale(self._image, (self.size * 3, self.size * 3))
+            current_image = self._flipped_image if self._is_facing_left else self._image
+            tower_surface = pygame.transform.scale(current_image, (self.size * 3, self.size * 3))
             window.blit(tower_surface, (adjusted_x, adjusted_y))
 
     def _render_range(self, window):
@@ -135,6 +139,8 @@ class Tower(ABC):
             return
         for enemy in enemies:
             if self._in_range(enemy):
+                self._is_facing_left = enemy._position[0] < self._position[0]
+
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
@@ -175,6 +181,7 @@ class normal_tower(Tower):
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "Basic_Tower.png"))
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+        self._flipped_image = pygame.transform.flip(self._image, True, False)
     
 class Archer_Tower(Tower):
     def __init__(self):
@@ -183,6 +190,7 @@ class Archer_Tower(Tower):
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "Archer_Tower.png"))
+        self._flipped_image = pygame.transform.flip(self._image, True, False)
 
     def attack(self, enemies, projectiles_list):
         """Specific implementation for archer_tower's attack logic."""
@@ -192,6 +200,7 @@ class Archer_Tower(Tower):
 
         for enemy in enemies:
             if self._in_range(enemy):
+                self._is_facing_left = enemy._position[0] < self._position[0]
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
@@ -305,6 +314,7 @@ class cannon_tower(Tower):
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "cannon_tower.png"))
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+        self._flipped_image = pygame.transform.flip(self._image, True, False)
 
     def attack(self, enemies, projectiles_list):
         """Specific implementation for archer_tower's attack logic."""
@@ -314,6 +324,7 @@ class cannon_tower(Tower):
 
         for enemy in enemies:
             if self._in_range(enemy):
+                self._is_facing_left = enemy._position[0] < self._position[0]
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
@@ -427,7 +438,9 @@ class slingshot_tower(Tower):
         self._upgrade_level = 1
         self._upgrade_cost = self._price + (self._price * 0.25)
         self._image = pygame.image.load(os.path.join('game_assests', "slingshot_tower.png"))
+        self._flipped_image = pygame.transform.flip(self._image, True, False)
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+
     def attack(self, enemies, projectiles_list):
         """Specific implementation for slingshot_tower's attack logic."""
         if self._cooldown_counter > 0:
@@ -436,6 +449,7 @@ class slingshot_tower(Tower):
 
         for enemy in enemies:
             if self._in_range(enemy):
+                self._is_facing_left = enemy._position[0] < self._position[0]
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
