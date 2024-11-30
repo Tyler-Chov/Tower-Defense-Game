@@ -2,6 +2,7 @@ import pygame, sys, os, button, pygame_widgets
 from tower import Archer_Tower, cannon_tower, slingshot_tower, normal_tower
 from enemy import Enemy
 from waves import Wave
+from projectile import Projectile
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 import text_button
@@ -113,6 +114,7 @@ class Stage_Select_Screen:
 
         self.click_sound = pygame.mixer.Sound(os.path.join('game_assests/sounds', 'click.mp3'))
         self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+
     def render(self):
         self.window.blit(self.background, (0, 0))
         if self.hovered_stage == "stage1" or self.stage_selection == "stage1":
@@ -216,8 +218,8 @@ class MainGameScreen:
         """Sets pause to True when initially ran."""
         self.map = map
         self.return_to_stage_select = False
-    
-
+        self.projectiles = []
+        self.explosions = []
         # Map Variables
         if self.map == 1:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
@@ -442,6 +444,21 @@ class MainGameScreen:
                         self.remove_health(enemy._strength)
                         self.remove_money(enemy._resource_worth)
             self.update_attacks()
+        
+        for projectile in self.projectiles[:]:
+            if projectile.is_active():
+                projectile.move()
+                projectile.render(self.window)
+            else:
+                projectile.apply_splash_damage(self._enemy_list, self.explosions)
+                self.projectiles.remove(projectile)
+
+        for explosion in self.explosions[:]:
+            if explosion.is_active():
+                explosion.update()
+                explosion.render(self.window)
+            else:
+                self.explosions.remove(explosion)
 
         # Display menu and UI
         side_bar.draw()
@@ -641,7 +658,7 @@ class MainGameScreen:
 
     def update_attacks(self):
         for tower in self.placed_towers:
-            tower.attack(self._enemy_list)
+            tower.attack(self._enemy_list, self.projectiles)
         for enemy in self._enemy_list:
             if not enemy.is_alive():
                 self.add_money(enemy._resource_worth)
