@@ -3,7 +3,7 @@ import os
 import math
 
 class Projectile:
-    def __init__(self, position, target, speed, damage, size, image_path="game_assests/projectile.png", AoE_radius = 0, ):
+    def __init__(self, position, target, speed, damage, size, image_path="game_assests/projectile.png", AoE_radius = 0, tower = None):
         self._position = list(position)
         self._target = target
         self._speed = speed
@@ -15,6 +15,7 @@ class Projectile:
         self._AoE_radius = AoE_radius
         self._size = size
         self._explosions = []
+        self._tower = tower
 
     def move(self):
         if not self._target.is_alive():
@@ -29,7 +30,10 @@ class Projectile:
         if distance < self._speed: 
             self._position = [tx, ty]
             self._active = False
+            was_alive = self._target.is_alive()
             self._target.take_damage(self._damage)
+            if was_alive and not self._target.is_alive():
+                self._tower._enemies_defeated += 1
         else:  
             self._position[0] += dir_x / distance * self._speed
             self._position[1] += dir_y / distance * self._speed

@@ -1,4 +1,4 @@
-import pygame, sys, os, button, pygame_widgets
+import pygame, sys, os, button, pygame_widgets, random
 from tower import Archer_Tower, cannon_tower, slingshot_tower, normal_tower
 from enemy import Enemy
 from waves import Wave
@@ -268,17 +268,46 @@ class MainGameScreen:
         for wave_number in range(1, 60):
             """Loop for generating waves, changes are planned to further improve."""
             enemy_count = 3 * wave_number
+            if wave_number <= 10:
+                types_of_enemy = [{'type': 'circle', 'weight': 1, 'path': self.map_path},
+                                  {'type': 'triangle', 'weight': 0, 'path': self.map_path},
+                                  {'type': 'rectangle', 'weight': 0, 'path': self.map_path},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+            elif wave_number <= 20:
+                types_of_enemy = [{'type': 'circle', 'weight': 0.9, 'path': self.map_path},
+                                  {'type': 'triangle', 'weight': 0.1, 'path': self.map_path},
+                                  {'type': 'rectangle', 'weight': 0, 'path': self.map_path},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+            elif wave_number < 30:
+                types_of_enemy = [{'type': 'circle', 'weight': 0.6, 'path': self.map_path},
+                                  {'type': 'triangle', 'weight': 0.1, 'path': self.map_path},
+                                  {'type': 'rectangle', 'weight': 0.3, 'path': self.map_path},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+            elif wave_number == 30:
+                types_of_enemy = [{'type': 'circle', 'weight': 0, 'path': self.map_path},
+                                  {'type': 'triangle', 'weight': 0, 'path': self.map_path},
+                                  {'type': 'rectangle', 'weight': 1, 'path': self.map_path},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+            elif wave_number < 60:
+                types_of_enemy = [{'type': 'circle', 'weight': 0.4, 'path': self.map_path},
+                                  {'type': 'triangle', 'weight': 0.2, 'path': self.map_path},
+                                  {'type': 'rectangle', 'weight': 0.4, 'path': self.map_path},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+            elif wave_number == 60:
+                types_of_enemy = [{'type': 'circle', 'weight': 0.3, 'path': self.map_path},
+                                  {'type': 'triangle', 'weight': 0.2, 'path': self.map_path},
+                                  {'type': 'rectangle', 'weight': 0.4, 'path': self.map_path},
+                                  {'type': 'ghost', 'weight': 0.1, 'path': self.map_path}]
             """Determines amount of enemies to be spawned, dependent on wave number."""
-            enemy_hp = 10 + (5 * wave_number)
-            """Increases health of the enemies, dependent on wave number."""
-            speed = 1 + (0.2 * wave_number)
-            """Increases speed of the enemies, dependent on wave number."""
-            wave_data = [
-                Enemy('circle', enemy_hp, speed, 1, self.map_path) for i in range(enemy_count)
-            ]
-            """Generate wave data, to be added to self._waves"""
+            wave_data = []
+            for enemy_type in types_of_enemy:
+                count = int(enemy_count * enemy_type["weight"])
+                for _ in range(count):
+                    wave_data.append(
+                        Enemy(enemy_type["type"], enemy_type["path"])
+                    )
+            random.shuffle(wave_data)
             self._waves.append(Wave(wave_data, 60))
-
             # Debugging Variables
         self.debug = False
         """Used to help debug."""
@@ -616,6 +645,7 @@ class MainGameScreen:
             else:
                 self.grid_active = False
                 self.selected_tower = False
+                return
             # need to expand on this to allow for different towers
             new_tower.place(mouse_pos)
             self.placed_towers.append(new_tower)

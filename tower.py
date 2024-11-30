@@ -147,7 +147,9 @@ class Tower(ABC):
                     speed=10,  
                     damage=self._damage,
                     size = 32,
-                    image_path=self.projectile_image
+                    image_path=self.projectile_image,
+                    AoE_radius= 0,
+                    tower = self
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
@@ -204,10 +206,12 @@ class Archer_Tower(Tower):
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
-                    speed=10,  
+                    speed=15,  
                     damage=self._damage,
                     size = 30,
-                    image_path=self.projectile_image
+                    image_path=self.projectile_image,
+                    AoE_radius= 0,
+                    tower = self
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
@@ -328,11 +332,12 @@ class cannon_tower(Tower):
                 projectile = Projectile(
                     position=self._position,
                     target=enemy,
-                    speed=7, 
+                    speed=9, 
                     damage=self._damage,
                     size = 60,
                     image_path=self.projectile_image,
-                    AoE_radius= 70
+                    AoE_radius= 70,
+                    tower = self
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
@@ -456,7 +461,9 @@ class slingshot_tower(Tower):
                     speed=10,  
                     damage=self._damage,
                     size = 32,
-                    image_path=self.projectile_image
+                    image_path=self.projectile_image,
+                    AoE_radius= 0,
+                    tower = self
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
