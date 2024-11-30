@@ -1,7 +1,12 @@
-import pygame, sys, os, button, random
-from tower import Tower
+import pygame, sys, os, button, pygame_widgets, random,
+from tower import Archer_Tower, cannon_tower, slingshot_tower, normal_tower
 from enemy import Enemy
 from waves import Wave
+from projectile import Projectile
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
+import text_button
+
 
 FPS = 60
 fpsClock = pygame.time.Clock()
@@ -11,6 +16,15 @@ window_height = 600
 pygame.display.set_caption('Tower Defense Game')
 pygame.init()
 window = pygame.display.set_mode((window_width, window_height))
+
+
+#define colours
+bg = (204, 102, 0)
+red = (255, 0, 0)
+black = (0, 0, 0)
+white = (255, 255, 255)
+green = (0, 180, 0)
+grey = (100, 100, 100)
 
 
 class StartScreen:
@@ -79,6 +93,100 @@ class StartScreen:
         return False
 
 
+
+class Stage_Select_Screen:
+    def __init__(self, window):
+        self.window = window
+        self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select.png'))
+        self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        self.font = pygame.font.SysFont(None, 55)
+        self.stage_selection = None
+        self.difficulty_selection = None
+        self.hovered_stage = None
+        self.hovered_difficulty = None
+        self.start_button_hovered = False
+        self.stage1_button_rect = pygame.Rect(147, 125, 236, 110)
+        self.stage2_button_rect = pygame.Rect(147, 245, 236, 110)
+        self.stage3_button_rect = pygame.Rect(147, 365, 236, 110)
+        self.easy_button_rect = pygame.Rect(403, 398, 76, 34)
+        self.medium_button_rect = pygame.Rect(491, 398, 77, 34)
+        self.hard_button_rect = pygame.Rect(579, 398, 77, 34)
+        self.start_button_rect = pygame.Rect(402, 441, 254, 37)
+
+        self.click_sound = pygame.mixer.Sound(os.path.join('game_assests/sounds', 'click.mp3'))
+        self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+
+    def render(self):
+        self.window.blit(self.background, (0, 0))
+        if self.hovered_stage == "stage1" or self.stage_selection == "stage1":
+            self._draw_overlay(self.stage1_button_rect)
+        if self.hovered_stage == "stage2" or self.stage_selection == "stage2":
+            self._draw_overlay(self.stage2_button_rect)
+        if self.hovered_stage == "stage3" or self.stage_selection == "stage3":
+            self._draw_overlay(self.stage3_button_rect)
+        if self.hovered_difficulty == "easy" or self.difficulty_selection == "easy":
+            self._draw_overlay(self.easy_button_rect)
+        if self.hovered_difficulty == "medium" or self.difficulty_selection == "medium":
+            self._draw_overlay(self.medium_button_rect)
+        if self.hovered_difficulty == "hard" or self.difficulty_selection == "hard":
+            self._draw_overlay(self.hard_button_rect)
+        if self.start_button_hovered:
+            self._draw_overlay(self.start_button_rect)
+        pygame.display.update()
+
+    def check_for_click(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            mouse_pos = pygame.mouse.get_pos()
+            self.hovered_stage = None
+            self.hovered_difficulty = None
+            self.start_button_hovered = False
+
+            if self.stage1_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage1"
+            if self.stage2_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage2"
+            if self.stage3_button_rect.collidepoint(mouse_pos):
+                self.hovered_stage = "stage3"
+
+            if self.easy_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "easy"
+            if self.medium_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "medium"
+            if self.hard_button_rect.collidepoint(mouse_pos):
+                self.hovered_difficulty = "hard"
+
+            if self.start_button_rect.collidepoint(mouse_pos):
+                self.start_button_hovered = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.click_sound.set_volume(sound_volume)
+                pygame.mixer.Sound.play(self.click_sound)
+                if self.hovered_stage:
+                    self.stage_selection = self.hovered_stage
+                if self.hovered_difficulty:
+                    self.difficulty_selection = self.hovered_difficulty
+                if self.start_button_hovered:
+                    return True  
+
+    def _draw_overlay(self, rect):
+        overlay = pygame.Surface((rect.width, rect.height))
+        overlay.set_alpha(90)
+        overlay.fill((0, 0, 0))
+        self.window.blit(overlay, (rect.x, rect.y))
+
+    def return_selection(self):
+        return {
+            "stage": self.stage_selection,
+            "difficulty": self.difficulty_selection
+        }
+    
+    def reset_selection(self):
+        self.stage_selection = None
+        self.difficulty_selection = None
+
+
 class MainGameScreen:
     """The game screen which shows the map and handles the generation of enemies, towers, and player stats."""
 
@@ -97,17 +205,23 @@ class MainGameScreen:
         """Renders the health text so the player knows how much health they have remaining."""
         self.money = 0
         """Holds the amount of money the player has"""
-        self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
+        self.money_text = self.font.render(f'Money: {int(self.money)}', True, (255, 255, 255))
         """Renders the money text so the player knows how much money they have remaining."""
 
         # Pause button
         pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         """The image of the pause button."""
         self.pause_button = button.Button(710, 510, pause_img, 0.15)
+        # self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
+        self.wave_pause_button = text_button.Button(710, 510, 75, 75, "pause", grey, window)
+        self.wave_play_button = text_button.Button(710, 510, 75, 75, "play", grey, window)
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
         self.pause = True
         """Sets pause to True when initially ran."""
-
+        self.map = map
+        self.return_to_stage_select = False
+        self.projectiles = []
+        self.explosions = []
         # Map Variables
         self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322),
                          (444, 226), (700, 226), (800, 226))
@@ -131,6 +245,7 @@ class MainGameScreen:
         self.tower_size = 3
         """Determines the tower size"""
         self.selected_tower = None
+        self.selected_tower_type = None
         """Determines which tower the player has selected."""
         self.placed_towers = []
         """A list to hold all the towers that have been placed."""
@@ -236,10 +351,31 @@ class MainGameScreen:
             Rectangle(705, 400, 90, 90, (100, 100, 100))
         ]
         """Makes the rectangles for the tower boxes."""
-        tower_image = pygame.image.load(os.path.join("game_assests", "tower.png"))
+
+        health_box = Rectangle(5, 505, 680, 90, (100, 100, 100))
+        # health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
+        """Makes the rectangles for the health bar/box"""
+       
+        upgrade_boxes = [
+            Rectangle(5, 505, 190, 90, (100, 100, 100)),
+            Rectangle(200, 505, 195, 90, (100, 100, 100)),
+            Rectangle(400, 505, 195, 90, (100, 100, 100)),
+            Rectangle(600, 505, 100, 90, (100, 100, 100))
+        ]
+        """Makes the rectangles for the upgrade butons."""
+
+        normal_tower_image = pygame.image.load(os.path.join("game_assests", "Basic_Tower.png"))
         """Loads tower image."""
-        tower_image = pygame.transform.scale(tower_image, (90, 90))
+        normal_towertower_image = pygame.transform.scale(normal_tower_image, (90, 90))
         """Scales tower image."""
+        Archer_Tower_image = pygame.image.load(os.path.join("game_assests", "Archer_Tower.png"))
+        Archer_Tower_image = pygame.transform.scale(Archer_Tower_image, (90, 90))
+
+        slingshot_tower_image = pygame.image.load(os.path.join("game_assests", "Slingshot_Tower.png"))
+        slingshot_tower_image = pygame.transform.scale(slingshot_tower_image, (90, 90))
+        
+        cannon_tower_image = pygame.image.load(os.path.join("game_assests", "Cannon_Tower.png"))
+        cannon_tower_image = pygame.transform.scale(cannon_tower_image, (90, 90))
 
         if self.grid_active:
             """Checks if grid is currently active, then renders a preview of the tower selected."""
@@ -248,9 +384,57 @@ class MainGameScreen:
         if self.selected_tower:
             """Renders the attack radius of the selected tower."""
             self.draw_radius(self.selected_tower._position, self.selected_tower.get_range(), (128, 128, 128, 100))
-            # Logic for upgrades and tower selection info should go here
+            for box in upgrade_boxes:
+                box.draw()
+            
+            upgrade_damage_button = text_button.Button(210, 540, 180, 50, (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"), green, window)
+            upgrade_cooldown_button = text_button.Button(410, 540, 180, 50, (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"), green, window)
+            sell_button = text_button.Button(605, 540, 90, 50, (f"Sell"), red, window)
+            image = self.selected_tower._image
+            width = image.get_width()
+            height = image.get_height()
+            scale = 1.5
+            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+
+            self.name_text = self.font.render(f"{self.selected_tower._name}", True, (255, 255, 255))
+            self.enemys_defeated_text = self.font.render(f"Enemies Defeated: {self.selected_tower._enemies_defeated}", True, (255, 255, 255))
+            self.sell_price_text = self.font.render(f"Sell Price: {self.selected_tower._sell_price}", True, (255, 255, 255))
+            self.attack_damage_text = self.font.render(f"Attack Damage: {self.selected_tower._damage}", True, (255, 255, 255))
+            self.attack_cooldown_text = self.font.render(f"Attack Cooldown: {self.selected_tower._shot_cooldown}", True, (255, 255, 255))
+            self.window.blit(self.attack_damage_text, (210, 510))
+            self.window.blit(self.attack_cooldown_text, (410, 510))
+            self.window.blit(self.name_text, (10, 510))
+            self.window.blit(self.image, (10, 520))
+            self.window.blit(self.enemys_defeated_text, (10, 580))
+            self.window.blit(self.sell_price_text, (605, 510))
+            if upgrade_damage_button.draw_button():
+                # self.selected_tower.upgrade_tower()
+                
+                if self.money >= self.selected_tower._upgrade_cost:
+                    self.selected_tower._damage = int(self.selected_tower._damage + 5)
+                    self.remove_money(self.selected_tower._upgrade_cost)
+                
+            if upgrade_cooldown_button.draw_button():
+                if self.money >= (int(self.selected_tower._upgrade_cost)):
+                    self.selected_tower._shot_cooldown = int(self.selected_tower._shot_cooldown * .75)
+                    self.remove_money(int(self.selected_tower._upgrade_cost))
+
+            if sell_button.draw_button():
+                self.add_money(self.selected_tower._sell_price)
+                self.selected_tower.sell_tower
+                # TODO - add logic for removing towers
+                self.placed_towers.remove(self.selected_tower)
+                self.selected_tower._position = (900, 900)
+                self.selected_tower = None
+            
+        else:
+            health_box.draw()
+            # health_bar.draw()
 
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
+        self.archer_price = self.font.render(f'$150', True, (255, 255, 255))
+        self.slingshot_price = self.font.render(f'$500', True, (255, 255, 255))
+        self.cannon_price = self.font.render(f'$300', True, (255, 255, 255))
         """Renders the price of tower1."""
 
         for tower in self.placed_towers:
@@ -282,6 +466,21 @@ class MainGameScreen:
                         self.remove_health(enemy._strength)
                         self.remove_money(enemy._resource_worth)
             self.update_attacks()
+        
+        for projectile in self.projectiles[:]:
+            if projectile.is_active():
+                projectile.move()
+                projectile.render(self.window)
+            else:
+                projectile.apply_splash_damage(self._enemy_list, self.explosions)
+                self.projectiles.remove(projectile)
+
+        for explosion in self.explosions[:]:
+            if explosion.is_active():
+                explosion.update()
+                explosion.render(self.window)
+            else:
+                self.explosions.remove(explosion)
 
         # Display menu and UI
         bottom_bar.draw()
@@ -289,12 +488,22 @@ class MainGameScreen:
         for box in tower_boxes:
             """Draws each box in the tower_boxes list."""
             box.draw()
-        self.window.blit(tower_image, (705, 95))
+        self.window.blit(normal_tower_image, (717, 100))
+        self.window.blit(Archer_Tower_image, (705, 195))
+        self.window.blit(slingshot_tower_image, (705, 295))
+        self.window.blit(cannon_tower_image, (710, 395))
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
         self.window.blit(self.tower1_price, (731, 167))
-        self.pause_button.draw(window)
+        self.window.blit(self.archer_price, (731, 267))
+        self.window.blit(self.cannon_price, (731, 467))
+        self.window.blit(self.slingshot_price, (731, 367))
+        if self.wave_pause == False:
+            self.wave_pause_button.draw_button()
+        if self.wave_pause == True:
+            self.wave_play_button.draw_button()
+        self.window.blit(self.game_pause_img, (10, 10))
         pygame.display.update()
 
     def check_for_click(self):
@@ -310,9 +519,10 @@ class MainGameScreen:
                     pygame.Rect(705, 300, 90, 90),
                     pygame.Rect(705, 400, 90, 90)
                 ]
-                for box in tower_boxes:
+                for i, box in enumerate(tower_boxes):
                     if box.collidepoint(mouse_pos):
                         self.grid_active = not self.grid_active
+                        self.selected_tower_type = i
                         return
                 if self.grid_active:
                     self.place_tower(mouse_pos)
@@ -362,7 +572,14 @@ class MainGameScreen:
 
     def render_tower_preview(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        temp_tower = Tower("Archer Tower", 50, 3, 100, 80, 1)
+        if self.selected_tower_type == 0:
+            temp_tower = normal_tower()
+        elif self.selected_tower_type == 1:
+            temp_tower = Archer_Tower()
+        elif self.selected_tower_type == 2:
+            temp_tower = slingshot_tower()
+        elif self.selected_tower_type == 3:
+            temp_tower = cannon_tower()
         if self.check_collision(mouse_x, mouse_y):
             color = (255, 0, 0, 100)
         else:
@@ -378,18 +595,35 @@ class MainGameScreen:
 
     def place_tower(self, mouse_pos):
         if not self.check_collision(mouse_pos[0], mouse_pos[1]):
-            if self.money < 200:
-                return
-            new_tower = Tower("Archer Tower", 20, 2, 1, 80, 1)
+            if self.selected_tower_type == 0:
+                new_tower = normal_tower()
+            elif self.selected_tower_type == 1:
+                new_tower = Archer_Tower()
+            elif self.selected_tower_type == 2:
+                new_tower = slingshot_tower()
+            elif self.selected_tower_type == 3:
+                new_tower = cannon_tower()
+            if self.money >= new_tower.get_price():
+                new_tower.place(mouse_pos)
+                self.placed_towers.append(new_tower)
+                self.grid_active = False
+                self.remove_money(new_tower.get_price())
+            else:
+                self.grid_active = False
+                self.selected_tower = False
             # need to expand on this to allow for different towers
             new_tower.place(mouse_pos)
             self.placed_towers.append(new_tower)
             self.grid_active = False
             self.selected_tower = False
-            self.remove_money(200)
         else:
-            print("Cannot place the tower here. Collision detected.")
+            #print("Cannot place the tower here. Collision detected.")
+            pass
 
+        """def remove_tower(self):
+            self.paced_towers.remove(tower)
+            self.tower._position = None"""
+        
     def check_collision(self, x, y):
         preview_size = self.grid_size * self.tower_size
 
@@ -419,7 +653,7 @@ class MainGameScreen:
 
     def update_attacks(self):
         for tower in self.placed_towers:
-            tower.attack(self._enemy_list)
+            tower.attack(self._enemy_list, self.projectiles)
         for enemy in self._enemy_list:
             if not enemy.is_alive():
                 self.add_money(enemy._resource_worth)
@@ -451,7 +685,7 @@ class MainGameScreen:
             self.game_over()
 
     def add_money(self, money):
-        self.money += money
+        self.money += int(money)
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
     def remove_money(self, money):
