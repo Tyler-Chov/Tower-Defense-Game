@@ -110,10 +110,16 @@ class Enemy:
         self._draw_health_bar(window)
 
     def _draw_health_bar(self, window):
-        """Creates a visual for the player to know the status of the enemy's health"""
-        health_ratio = self._health / self._max_health
-        """Finds ratio of health"""
+        """Creates a visual for the player to know the status of the enemy's health."""
+        if self._max_health <= 0:  # Prevent division by zero
+            return
+
+        health_ratio = max(0, min(self._health / self._max_health, 1))  # Clamp ratio between 0 and 1
         green = int(255 * health_ratio)
         red = 255 - green
-        pygame.draw.rect(window, (red, green, 0),
-                         (self._position[0] - 15, self._position[1] - 20, 30 * health_ratio, 5))
+        pygame.draw.rect(
+            window, 
+            (red, green, 0), 
+            (self._position[0] - 15, self._position[1] - 20, 30 * health_ratio, 5)
+        )
+
