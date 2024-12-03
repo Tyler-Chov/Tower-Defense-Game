@@ -217,10 +217,12 @@ class MainGameScreen:
         self.projectiles = []
         self.explosions = []
         self.background_color = grey
+        self.music = None
         # Map Variables
         if self.map == 1:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
             """Loads the image."""
+            self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_One_Song.mp3'))
             self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
             self.map_path = ((0, 274), (128, 274), (128, 124), (294, 124), (294, 328), (522, 328),
                             (522, 226), (700, 226), (800, 226))
@@ -235,6 +237,7 @@ class MainGameScreen:
 
         elif map == 2:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_two.png'))
+            self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_Two_Song.mp3'))
             self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
             self.map_path = ((84, 0), (84, 184), (360, 184), (360, 346), (84, 346), (84, 454), (530, 454), (530, 134), (750, 134), (800, 134))
             self.collision_rects = [(64, 0, 40, 184), (84, 164, 276, 40), (340, 184, 40, 162), (84, 326, 276, 40), (64, 346, 40, 108), (84, 434, 446, 40), 
@@ -243,9 +246,8 @@ class MainGameScreen:
             self.box_color = (142, 175, 219)
             self.selected_box_color = (102, 135, 179)
 
-
-
         elif map == 3:
+            self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_Three_Song.mp3'))
             self.background = pygame.image.load(os.path.join('game_assests', 'map_three.png'))
             self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
             self.map_path = ((0, 398), (364, 398), (364,134), (88, 134), (88, 242), (530, 242), (530, 396), (644, 396), (644, 184), (750, 184), (800, 184))
