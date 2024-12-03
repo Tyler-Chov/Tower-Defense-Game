@@ -4,34 +4,44 @@ import pygame.draw, os
 
 class Enemy:
     """Class that handles the creation of enemies"""
-    def __init__(self, e_type,  path):
+    def __init__(self, e_type,  path, difficulty):
         self._type = e_type
+        if difficulty == 'easy':
+            self.health_multiplier = 1
+            self.speed_multiplier = 1
+        if difficulty == 'medium':
+            self.health_multiplier = 1.5
+            self.speed_multiplier = 1.5
+        if difficulty == 'hard':
+            self.health_multiplier = 2
+            self.speed_multiplier = 2
+
         """The type of enemy, to be used at a later date for different kinds of enemies"""
         if e_type == 'circle':
-            self._speed = 1
+            self._speed = 1 * self.speed_multiplier
             self._strength = 1
-            self._health = 50
+            self._health = 50 * self.health_multiplier
             self._max_health = self._health
             self._image = pygame.image.load(os.path.join("game_assests", "circle_ENEMY.png"))
 
         if e_type == 'triangle':
-            self._speed = 5
+            self._speed = 5 * self.speed_multiplier
             self._strength = 1
-            self._health = 50
+            self._health = 50 * self.health_multiplier
             self._max_health = self._health
             self._image = pygame.image.load(os.path.join("game_assests", "Triangle Enemy.png"))
 
         if e_type == 'rectangle':
-            self._speed = 0.5
+            self._speed = 0.5 * self.speed_multiplier
             self._strength = 5
-            self._health = 200
+            self._health = 200 * self.health_multiplier
             self._max_health = self._health
             self._image = pygame.image.load(os.path.join("game_assests", "Rectangle_Enemy.png"))
 
         if e_type == 'ghost':
-            self._speed = 1
+            self._speed = 1 * self.speed_multiplier
             self._strength = 20
-            self._health = 1000
+            self._health = 1000 * self.health_multiplier
             self._max_health = self._health
             self._image = pygame.image.load(os.path.join("game_assests", "Ghost-Enemy.png"))
 
@@ -111,10 +121,10 @@ class Enemy:
 
     def _draw_health_bar(self, window):
         """Creates a visual for the player to know the status of the enemy's health."""
-        if self._max_health <= 0:  # Prevent division by zero
+        if self._max_health <= 0: 
             return
 
-        health_ratio = max(0, min(self._health / self._max_health, 1))  # Clamp ratio between 0 and 1
+        health_ratio = max(0, min(self._health / self._max_health, 1))  
         green = int(255 * health_ratio)
         red = 255 - green
         pygame.draw.rect(

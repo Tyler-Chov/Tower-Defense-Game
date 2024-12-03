@@ -269,42 +269,42 @@ class MainGameScreen:
             """Loop for generating waves, changes are planned to further improve."""
             enemy_count = 3 * wave_number
             if wave_number <= 10:
-                types_of_enemy = [{'type': 'circle', 'weight': 1, 'path': self.map_path},
-                                  {'type': 'triangle', 'weight': 0, 'path': self.map_path},
-                                  {'type': 'rectangle', 'weight': 0, 'path': self.map_path},
-                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+                types_of_enemy = [{'type': 'circle', 'weight': 1, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'triangle', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'rectangle', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty}]
             elif wave_number <= 20:
-                types_of_enemy = [{'type': 'circle', 'weight': 0.9, 'path': self.map_path},
-                                  {'type': 'triangle', 'weight': 0.1, 'path': self.map_path},
-                                  {'type': 'rectangle', 'weight': 0, 'path': self.map_path},
-                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+                types_of_enemy = [{'type': 'circle', 'weight': 0.9, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'triangle', 'weight': 0.1, 'path': self.map_path,'difficulty': self.difficulty},
+                                  {'type': 'rectangle', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty}]
             elif wave_number < 30:
-                types_of_enemy = [{'type': 'circle', 'weight': 0.6, 'path': self.map_path},
-                                  {'type': 'triangle', 'weight': 0.1, 'path': self.map_path},
-                                  {'type': 'rectangle', 'weight': 0.3, 'path': self.map_path},
-                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+                types_of_enemy = [{'type': 'circle', 'weight': 0.6, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'triangle', 'weight': 0.1, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'rectangle', 'weight': 0.3, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty}]
             elif wave_number == 30:
-                types_of_enemy = [{'type': 'circle', 'weight': 0, 'path': self.map_path},
-                                  {'type': 'triangle', 'weight': 0, 'path': self.map_path},
-                                  {'type': 'rectangle', 'weight': 1, 'path': self.map_path},
-                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+                types_of_enemy = [{'type': 'circle', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'triangle', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'rectangle', 'weight': 1, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty}]
             elif wave_number < 60:
-                types_of_enemy = [{'type': 'circle', 'weight': 0.4, 'path': self.map_path},
-                                  {'type': 'triangle', 'weight': 0.2, 'path': self.map_path},
-                                  {'type': 'rectangle', 'weight': 0.4, 'path': self.map_path},
-                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path}]
+                types_of_enemy = [{'type': 'circle', 'weight': 0.4, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'triangle', 'weight': 0.2, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'rectangle', 'weight': 0.4, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'ghost', 'weight': 0, 'path': self.map_path, 'difficulty': self.difficulty}]
             elif wave_number == 60:
-                types_of_enemy = [{'type': 'circle', 'weight': 0.3, 'path': self.map_path},
-                                  {'type': 'triangle', 'weight': 0.2, 'path': self.map_path},
-                                  {'type': 'rectangle', 'weight': 0.4, 'path': self.map_path},
-                                  {'type': 'ghost', 'weight': 0.1, 'path': self.map_path}]
+                types_of_enemy = [{'type': 'circle', 'weight': 0.3, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'triangle', 'weight': 0.2, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'rectangle', 'weight': 0.4, 'path': self.map_path, 'difficulty': self.difficulty},
+                                  {'type': 'ghost', 'weight': 0.1, 'path': self.map_path, 'difficulty': self.difficulty}]
             """Determines amount of enemies to be spawned, dependent on wave number."""
             wave_data = []
             for enemy_type in types_of_enemy:
                 count = int(enemy_count * enemy_type["weight"])
                 for _ in range(count):
                     wave_data.append(
-                        Enemy(enemy_type["type"], enemy_type["path"])
+                        Enemy(enemy_type["type"], enemy_type["path"], enemy_type["difficulty"])
                     )
             random.shuffle(wave_data)
             self._waves.append(Wave(wave_data, 60))
