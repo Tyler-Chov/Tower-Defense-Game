@@ -33,15 +33,12 @@ class Button():
         self.height = height
         self.text = text
         self.button_col = color
-        """if self.button_col[1] - 50 > 0:
-            self.hover_col = (self.button_col[0], (self.button_col[1] - 50), self.button_col[2])
-        else: 
-            self.hover_col = (self.button_col[0], (self.button_col[1] + 50), self.button_col[2])"""
         self.surface = surface
         self.hover_col = self.darken(color)
         self.click_col = self.hover_col
 
     def darken(self, color):
+        """returns a color 25 values darker than one that is given"""
         if color == black:
             return grey
         new_color = []
@@ -65,10 +62,10 @@ class Button():
         
         #check mouseover and clicked conditions
         if button_rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1:
+            if pygame.mouse.get_pressed()[0] == 1:  # left click true
                 clicked = True
                 pygame.draw.rect(self.surface, self.click_col, button_rect)
-            elif pygame.mouse.get_pressed()[0] == 0 and clicked == True:
+            elif pygame.mouse.get_pressed()[0] == 0 and clicked == True:  # left click false
                 clicked = False
                 action = True
             else:
@@ -87,5 +84,3 @@ class Button():
         text_len = text_img.get_width()
         self.surface.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 25))
         return action
-"""window = pygame.display.set_mode((600, 800))
-upgrade_damage_button = Button(180, 540, 100, 50, 'Upgrade', green, window)"""
