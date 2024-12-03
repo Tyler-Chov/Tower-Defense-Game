@@ -42,6 +42,7 @@ class Tower(ABC):
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
         self._flipped_image = pygame.transform.flip(self._image, True, False)
         self._is_facing_left = False
+        self._shoot_sound = None
 
 
     def render(self, window):
@@ -153,6 +154,9 @@ class Tower(ABC):
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
+
+                if self._shoot_sound:
+                    pygame.mixer.Sound.play(self._shoot_sound)
                 break
 
     def _in_range(self, enemy):
@@ -174,6 +178,14 @@ class Tower(ABC):
             "Upgrade Cost": self._upgrade_cost
         }
 
+    def load_sound(self, sound_path):
+            """Loads the sound effect for the tower."""
+            self._shoot_sound = pygame.mixer.Sound(os.path.join("game_assests/sounds", sound_path))
+    
+    def update_volume(self, new_volume):
+        """Updates the sound volume for the tower."""
+        if self._shoot_sound:
+            self._shoot_sound.set_volume(new_volume)
 
 class normal_tower(Tower):
     def __init__(self):
@@ -184,6 +196,7 @@ class normal_tower(Tower):
         self._image = pygame.image.load(os.path.join('game_assests', "Basic_Tower.png"))
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
         self._flipped_image = pygame.transform.flip(self._image, True, False)
+        self.load_sound("normal_tower_shoot.wav")
     
 class Archer_Tower(Tower):
     def __init__(self):
@@ -194,6 +207,8 @@ class Archer_Tower(Tower):
         self._image = pygame.image.load(os.path.join('game_assests', "Archer_Tower.png"))
         self._flipped_image = pygame.transform.flip(self._image, True, False)
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "arrow.png"))
+        self.load_sound("archer_tower_shoot.wav")
+
     def attack(self, enemies, projectiles_list):
         """Specific implementation for archer_tower's attack logic."""
         if self._cooldown_counter > 0:
@@ -215,6 +230,9 @@ class Archer_Tower(Tower):
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
+                if self._shoot_sound:
+                    pygame.mixer.Sound.play(self._shoot_sound)
+                    
                 break
 
     def upgrade_tower(self):
@@ -319,6 +337,7 @@ class cannon_tower(Tower):
         self._image = pygame.image.load(os.path.join('game_assests', "cannon_tower.png"))
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
         self._flipped_image = pygame.transform.flip(self._image, True, False)
+        self.load_sound("cannon_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
         """Specific implementation for archer_tower's attack logic."""
@@ -341,6 +360,9 @@ class cannon_tower(Tower):
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
+                if self._shoot_sound:
+                    pygame.mixer.Sound.play(self._shoot_sound)
+                    
                 break
 
     def upgrade_tower(self):
@@ -445,6 +467,7 @@ class slingshot_tower(Tower):
         self._image = pygame.image.load(os.path.join('game_assests', "slingshot_tower.png"))
         self._flipped_image = pygame.transform.flip(self._image, True, False)
         self.projectile_image = pygame.image.load(os.path.join('game_assests', "projectile.png"))
+        self.load_sound("slingshot_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
         """Specific implementation for slingshot_tower's attack logic."""
@@ -464,9 +487,13 @@ class slingshot_tower(Tower):
                     image_path=self.projectile_image,
                     AoE_radius= 0,
                     tower = self
+                    
                 )
                 projectiles_list.append(projectile)
                 self._cooldown_counter = self._shot_cooldown
+                if self._shoot_sound:
+                    pygame.mixer.Sound.play(self._shoot_sound)
+                    
                 break
 
     def upgrade_tower(self):

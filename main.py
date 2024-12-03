@@ -244,7 +244,12 @@ class MainGameScreen:
             self.map_path = ((0, 398), (364, 398), (364,134), (88, 134), (88, 242), (530, 242), (530, 396), (644, 396), (644, 184), (750, 184), (800, 184))
             self.collision_rects = [(0, 378, 364, 40), (344, 134, 40, 264), (88, 114, 276, 40), (68, 134, 40, 108), (80, 220, 470, 40), (510, 244, 40, 152), 
             (530, 376, 114, 40), (644, 164, 106, 40), (750, 164, 50, 40)]
-
+        if self.map == 1:
+            self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_One_Song.mp3'))
+        elif self.map == 2:
+            self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_Two_Song.mp3'))
+        elif self.map == 3:
+            self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_Three_Song.mp3'))
         # Tower Variables
         self.grid_active = False
         """Used to show the grid"""
@@ -649,6 +654,7 @@ class MainGameScreen:
                 new_tower = slingshot_tower()
             elif self.selected_tower_type == 3:
                 new_tower = cannon_tower()
+            new_tower.update_volume(sound_volume)
             if self.money >= new_tower.get_price():
                 new_tower.place(mouse_pos)
                 self.placed_towers.append(new_tower)
@@ -763,13 +769,18 @@ class MainGameScreen:
                     mouse_pos = pygame.mouse.get_pos()
                     if back_button_rect.collidepoint(mouse_pos):
                         running = False
-    
+
             pygame_widgets.update(events)
             bgm_value = bgm_slider.getValue() / 10.0 
             sfx_value = sfx_slider.getValue() / 10.0  
             bgm_volume = bgm_value
             sound_volume = sfx_value
-            pygame.mixer.music.set_volume(bgm_volume) 
+            pygame.mixer.music.set_volume(bgm_volume)
+
+            # Update the volume of all towers
+            for tower in self.placed_towers:
+                tower.update_volume(sound_volume)
+
             self.window.fill((30, 30, 30))
             self.window.blit(overlay, (0, 0))
             pygame.draw.rect(self.window, (100, 100, 100), back_button_rect)
@@ -780,6 +791,7 @@ class MainGameScreen:
             bgm_slider.draw()
             sfx_slider.draw()
             pygame.display.flip()
+
 
     def pause_screen(self):
         paused = True
@@ -886,16 +898,19 @@ def main():
     main_game_screen = None  
 
     while True:
+        
         if game_state == 'start_screen':
             start_screen.render()
             if start_screen.check_for_click():
                 game_state = 'stage_select'
-
-        elif game_state == 'stage_select':
-            stage_select.render()
             if not pygame.mixer.music.get_busy():
-                pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
-                pygame.mixer.music.play(-1)
+                    pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+                    pygame.mixer.music.play(-1)
+        elif game_state == 'stage_select':
+            if not pygame.mixer.music.get_busy():
+                    pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+                    pygame.mixer.music.play(-1)
+            stage_select.render()
             if stage_select.check_for_click():
                 selection = stage_select.return_selection()
                 if selection["stage"] and selection["difficulty"]:
@@ -910,12 +925,15 @@ def main():
 
         elif game_state == 'main_game':
             if main_game_screen is not None:
+                if not pygame.mixer.music.get_busy():
+                    pygame.mixer.music.play(-1)
                 main_game_screen.render()
                 main_game_screen.check_for_click()
 
                 if main_game_screen.return_to_stage_select:
                     game_state = 'stage_select'
-                    main_game_screen = None  
+                    main_game_screen = None
+                    pygame.mixer.music.stop()
 
                 elif main_game_screen.pause:
                     result = main_game_screen.pause_screen()
