@@ -52,28 +52,17 @@ class StartScreen:
             window: The window surface where the start screen will be rendered.
         """
         self.window = window
-        self.background = pygame.image.load(os.path.join('game_assests', 'start_screen_background.jpg'))
+        self.background = pygame.image.load(os.path.join('game_assests', 'Start_Screen.png'))
         self.background = pygame.transform.scale(self.background, (window_width, window_height))
         self.font = pygame.font.SysFont(None, 55)
-        self.title_text = self.font.render('Tower Defense Game', True, (255, 255, 255))
-        self.start_text = self.font.render('Click to Start', True, (255, 255, 255))
+        self.start_button_rect = pygame.Rect(310, 444, 180, 46)
 
     def render(self):
         """
         Renders the start screen with the background, title, and start button.
         """
         self.window.blit(self.background, (0, 0))
-        self.window.blit(self.title_text, (window_width // 2 - self.title_text.get_width() // 2, 100))
-        start_text_rect = self.start_text.get_rect(center=(window_width // 2, 400))
-        rect_x = start_text_rect.x - 10
-        rect_y = start_text_rect.y - 10
-        rect_width = start_text_rect.width + 20
-        rect_height = start_text_rect.height + 20
-
-        pygame.draw.rect(self.window, (39, 145, 39), (rect_x, rect_y, rect_width, rect_height))
-        self.window.blit(self.start_text, start_text_rect.topleft)
         pygame.display.update()
-        self.start_button_rect = pygame.Rect(rect_x, rect_y, rect_width, rect_height)
 
     def check_for_click(self):
         """
@@ -96,10 +85,10 @@ class StartScreen:
 class Stage_Select_Screen:
     def __init__(self, window):
         self.window = window
-        self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select.png'))
+        self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select1.png'))
         self.background = pygame.transform.scale(self.background, (window_width, window_height))
         self.font = pygame.font.SysFont(None, 55)
-        self.stage_selection = None
+        self.stage_selection = "stage1"
         self.difficulty_selection = None
         self.hovered_stage = None
         self.hovered_difficulty = None
@@ -116,6 +105,16 @@ class Stage_Select_Screen:
         self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
 
     def render(self):
+        if self.stage_selection == "stage1":
+            self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select1.png'))
+            self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        elif self.stage_selection == "stage2":
+            self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select2.png'))
+            self.background = pygame.transform.scale(self.background, (window_width, window_height))
+        elif self.stage_selection == "stage3":
+            self.background = pygame.image.load(os.path.join('game_assests', 'Stage_Select3.png'))
+            self.background = pygame.transform.scale(self.background, (window_width, window_height))
+
         self.window.blit(self.background, (0, 0))
         if self.hovered_stage == "stage1" or self.stage_selection == "stage1":
             self._draw_overlay(self.stage1_button_rect)
@@ -171,7 +170,7 @@ class Stage_Select_Screen:
 
     def _draw_overlay(self, rect):
         overlay = pygame.Surface((rect.width, rect.height))
-        overlay.set_alpha(90)
+        overlay.set_alpha(150)
         overlay.fill((0, 0, 0))
         self.window.blit(overlay, (rect.x, rect.y))
 
@@ -225,26 +224,31 @@ class MainGameScreen:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
             """Loads the image."""
             self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
-            self.map_path = ((0, 274), (116, 274), (116, 124), (258, 124), (258, 322), (444, 322),
-                            (444, 226), (700, 226), (800, 226))
+            self.map_path = ((0, 274), (128, 274), (128, 124), (294, 124), (294, 328), (522, 328),
+                            (522, 226), (700, 226), (800, 226))
             """Sets the path for enemies to traverse."""
-            self.collision_rects = [
-                pygame.Rect(min(0, 140), min(248, 300), max(0, 140) - min(0, 140), max(248, 300) - min(248, 300)),
-                pygame.Rect(min(140, 96), min(300, 100), max(140, 96) - min(140, 96), max(300, 100) - min(300, 100)),
-                pygame.Rect(min(96, 278), min(100, 146), max(96, 278) - min(96, 278), max(146, 100) - min(100, 146)),
-                pygame.Rect(min(278, 230), min(146, 348), max(278, 230) - min(278, 230), max(348, 146) - min(146, 348)),
-                pygame.Rect(min(230, 470), min(348, 299), max(470, 230) - min(230, 470), max(348, 299) - min(299, 348)),
-                pygame.Rect(min(470, 418), min(299, 200), max(470, 418) - min(470, 418), max(299, 200) - min(200, 299)),
-                pygame.Rect(min(418, 700), min(200, 250), max(700, 418) - min(418, 700), max(250, 200) - min(200, 250)),
-            ]
+            self.collision_rects = [(0, 254, 128, 40), (108, 124, 40, 150), (128, 104, 166, 40), (274, 124, 40, 204), (294, 308, 228, 40), (502, 226, 40, 102), (522, 206, 178, 40), (700, 206, 100, 40)]
             """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
         elif map == 2:
-            pass
+            self.background = pygame.image.load(os.path.join('game_assests', 'map_two.png'))
+            self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
+            self.map_path = ((84, 0), (84, 184), (360, 184), (360, 346), (84, 346), (84, 454), (530, 454), (530, 134), (750, 134), (800, 134))
+            self.collision_rects = [(64, 0, 40, 184), (84, 164, 276, 40), (340, 184, 40, 162), (84, 326, 276, 40), (64, 346, 40, 108), (84, 434, 446, 40), 
+            (510, 134, 40, 320), (530, 114, 220, 40), (750, 114, 50, 40)]
+
+
+
+        elif map == 3:
+            self.background = pygame.image.load(os.path.join('game_assests', 'map_three.png'))
+            self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
+            self.map_path = ((0, 398), (364, 398), (364,134), (88, 134), (88, 242), (530, 242), (530, 396), (644, 396), (644, 184), (750, 184), (800, 184))
+            self.collision_rects = [(0, 378, 364, 40), (344, 134, 40, 264), (88, 114, 276, 40), (68, 134, 40, 108), (80, 220, 470, 40), (510, 244, 40, 152), 
+            (530, 376, 114, 40), (644, 164, 106, 40), (750, 164, 50, 40)]
 
         # Tower Variables
         self.grid_active = False
         """Used to show the grid"""
-        self.grid_size = 14  # Will remove later, some things still depend on this.
+        self.grid_size = 14 
         """Determines the grid size."""
         self.tower_size = 3
         """Determines the tower size"""
@@ -455,7 +459,6 @@ class MainGameScreen:
             """When debug is true, updates the game and renders various aspects."""
             self.update_cursor_position()
             self.draw_enemy_path()
-            self.render_tower_preview()
             self.render_collision_rects()
             '''
             for tower in self.placed_towers:
@@ -594,6 +597,8 @@ class MainGameScreen:
                     else:
                         self.debug = True
                     return
+                
+    
 
     def draw_radius(self, center, radius, color):
         range_surface = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
@@ -675,10 +680,12 @@ class MainGameScreen:
             )
             if preview_rect.colliderect(tower_rect):
                 return True
-
-        for rect in self.collision_rects:  # checking to see if collide with map path.
-            if preview_rect.colliderect(rect):
-                return True
+        try:
+            for rect in self.collision_rects:  # checking to see if collide with map path.
+                if preview_rect.colliderect(rect):
+                    return True
+        except:
+            pass
         bottom_bar = pygame.Rect(0, window_height - 100, window_width, 100)
         side_bar = pygame.Rect(window_width - 100, 0, 100, window_height)
 
