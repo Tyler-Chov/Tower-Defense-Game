@@ -32,9 +32,10 @@ class Button():
         self.width = width
         self.height = height
         self.text = text
-        self.button_col = color
+        self.button_col = self.add_transparency(color)
         self.surface = surface
         self.hover_col = self.darken(color)
+        self.hover_col = self.add_transparency(self.hover_col)
         self.click_col = self.hover_col
 
     def darken(self, color):
@@ -46,6 +47,14 @@ class Button():
             new_color.append(color[i])
             if color[i] >= 50:
                 new_color[i] = color[i] - 25
+        return new_color
+
+    def add_transparency(self, color):
+        """returns a color with fourth value"""
+        new_color = []
+        for i in range (3):
+            new_color.append(color[i])
+        new_color.append(50)
         return new_color
                 
     def draw_button(self):
@@ -70,8 +79,10 @@ class Button():
                 action = True
             else:
                 pygame.draw.rect(self.surface, self.hover_col, button_rect)
+
         else:
             pygame.draw.rect(self.surface, self.button_col, button_rect)
+            
         
         #add shading to button
         pygame.draw.line(self.surface, white, (self.x, self.y), (self.x + self.width, self.y), 2)

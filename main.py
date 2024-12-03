@@ -206,9 +206,6 @@ class MainGameScreen:
         wave_pause_img = pygame.image.load(os.path.join('game_assests', 'Play-Pause.png')).convert_alpha()
         """The image of the pause button."""
         # self.wave_pause_button = button.Button(710, 510, wave_pause_img, 0.15)
-        self.wave_pause_button = text_button.Button(710, 510, 75, 75, "pause", grey, window)
-        self.wave_play_button = text_button.Button(710, 510, 75, 75, "play", grey, window)
-        """Makes the pause button a button to be clicked, using the image stored in pause_img."""
 
         self.game_pause_img = pygame.image.load(os.path.join('game_assests', 'pause.png'))
         self.game_pause_img = pygame.transform.scale(self.game_pause_img, (30, 30))
@@ -219,6 +216,7 @@ class MainGameScreen:
         self.return_to_stage_select = False
         self.projectiles = []
         self.explosions = []
+        self.background_color = grey
         # Map Variables
         if self.map == 1:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_one.png'))
@@ -229,12 +227,21 @@ class MainGameScreen:
             """Sets the path for enemies to traverse."""
             self.collision_rects = [(0, 254, 128, 40), (108, 124, 40, 150), (128, 104, 166, 40), (274, 124, 40, 204), (294, 308, 228, 40), (502, 226, 40, 102), (522, 206, 178, 40), (700, 206, 100, 40)]
             """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
+
+            self.background_color = (146, 114, 86)
+            self.box_color = (166, 134, 106)
+            self.selected_box_color = (126, 94, 66)
+            """sets up the colors for the menu"""
+
         elif map == 2:
             self.background = pygame.image.load(os.path.join('game_assests', 'map_two.png'))
             self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
             self.map_path = ((84, 0), (84, 184), (360, 184), (360, 346), (84, 346), (84, 454), (530, 454), (530, 134), (750, 134), (800, 134))
             self.collision_rects = [(64, 0, 40, 184), (84, 164, 276, 40), (340, 184, 40, 162), (84, 326, 276, 40), (64, 346, 40, 108), (84, 434, 446, 40), 
             (510, 134, 40, 320), (530, 114, 220, 40), (750, 114, 50, 40)]
+            self.background_color = (122, 155, 199)
+            self.box_color = (142, 175, 219)
+            self.selected_box_color = (102, 135, 179)
 
 
 
@@ -244,6 +251,15 @@ class MainGameScreen:
             self.map_path = ((0, 398), (364, 398), (364,134), (88, 134), (88, 242), (530, 242), (530, 396), (644, 396), (644, 184), (750, 184), (800, 184))
             self.collision_rects = [(0, 378, 364, 40), (344, 134, 40, 264), (88, 114, 276, 40), (68, 134, 40, 108), (80, 220, 470, 40), (510, 244, 40, 152), 
             (530, 376, 114, 40), (644, 164, 106, 40), (750, 164, 50, 40)]
+            
+            self.background_color = (156, 114, 86)
+            self.box_color = (176, 134, 106)
+            self.selected_box_color = (136, 94, 66)
+            """sets up the colors for the menu"""
+
+        self.wave_pause_button = text_button.Button(710, 510, 75, 75, "pause", self.box_color, window)
+        self.wave_play_button = text_button.Button(710, 510, 75, 75, "play", self.box_color, window)
+        """Makes the pause button a button to be clicked, using the image stored in pause_img."""
 
         # Tower Variables
         self.grid_active = False
@@ -348,12 +364,13 @@ class MainGameScreen:
                 return self.rect.collidepoint(mouse_pos)
 
         # create menus, tower slots, and tower image
-        side_bar = Rectangle((window_width - 100), 0, 100, window_height, (150, 150, 150))
+        side_bar = Rectangle((window_width - 100), 0, 100, window_height, self.background_color)
         """Menu on the right side, shows player stats and towers that can be used."""
-        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, (150, 150, 150))
+        bottom_bar = Rectangle(0, (window_height - 100), window_width, 100, self.background_color)
         """Menu on the bottom, currently hold nothing."""
 
-        box_unselected_color = (100, 100, 100)
+        box_unselected_color = self.box_color
+        
         tower_boxes = [
             Rectangle(705, 100, 90, 90, box_unselected_color),
             Rectangle(705, 200, 90, 90, box_unselected_color),
@@ -362,15 +379,15 @@ class MainGameScreen:
         ]
         """Makes the rectangles for the tower boxes."""
 
-        health_box = Rectangle(5, 505, 680, 90, (100, 100, 100))
+        health_box = Rectangle(5, 505, 680, 90, self.background_color)
         # health_bar = Rectangle(10, 510, (670 * (self.health / 100)), 80, (0, 190, 0))
         """Makes the rectangles for the health bar/box"""
        
         upgrade_boxes = [
-            Rectangle(5, 505, 190, 90, (100, 100, 100)),
-            Rectangle(200, 505, 195, 90, (100, 100, 100)),
-            Rectangle(400, 505, 195, 90, (100, 100, 100)),
-            Rectangle(600, 505, 100, 90, (100, 100, 100))
+            Rectangle(5, 505, 190, 90, self.box_color),
+            Rectangle(200, 505, 195, 90, self.box_color),
+            Rectangle(400, 505, 195, 90, self.box_color),
+            Rectangle(600, 505, 100, 90, self.box_color)
         ]
         """Makes the rectangles for the upgrade butons."""
 
@@ -504,7 +521,7 @@ class MainGameScreen:
         mouse_pos = pygame.mouse.get_pos()
         for box in tower_boxes:
             if box.is_hovered(mouse_pos):
-                box.color = (70, 70, 70)
+                box.color = self.selected_box_color
             else:
                 box.color = box_unselected_color
         for box in tower_boxes:
