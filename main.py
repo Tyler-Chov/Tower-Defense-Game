@@ -1,4 +1,4 @@
-import pygame, sys, os, button, pygame_widgets, random
+import pygame, sys, os, pygame_widgets, random
 from tower import Archer_Tower, cannon_tower, slingshot_tower, normal_tower
 from enemy import Enemy
 from waves import Wave
@@ -398,11 +398,14 @@ class MainGameScreen:
             upgrade_damage_button = text_button.Button(210, 540, 180, 50, (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"), green, window)
             upgrade_cooldown_button = text_button.Button(410, 540, 180, 50, (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"), green, window)
             sell_button = text_button.Button(605, 540, 90, 50, (f"Sell"), red, window)
+            """creates the buttons for the tower"""
+
             image = self.selected_tower._image
             width = image.get_width()
             height = image.get_height()
             scale = 1.5
             self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+            """creates an image to display in the menu to show the selected tower"""
 
             self.name_text = self.font.render(f"{self.selected_tower._name}", True, (255, 255, 255))
             self.enemys_defeated_text = self.font.render(f"Enemies Defeated: {self.selected_tower._enemies_defeated}", True, (255, 255, 255))
@@ -415,17 +418,19 @@ class MainGameScreen:
             self.window.blit(self.image, (10, 520))
             self.window.blit(self.enemys_defeated_text, (10, 580))
             self.window.blit(self.sell_price_text, (605, 510))
+            """creates and display text regarding the towers stats, upgrades, and sell prices."""
+
             if upgrade_damage_button.draw_button():
-                # self.selected_tower.upgrade_tower()
-                
                 if self.money >= self.selected_tower._upgrade_cost:
                     self.selected_tower._damage = int(self.selected_tower._damage + 5)
                     self.remove_money(self.selected_tower._upgrade_cost)
-                
+            """upgrades damage and updates variables when button is pressed"""
+
             if upgrade_cooldown_button.draw_button():
                 if self.money >= (int(self.selected_tower._upgrade_cost)):
                     self.selected_tower._shot_cooldown = int(self.selected_tower._shot_cooldown * .75)
                     self.remove_money(int(self.selected_tower._upgrade_cost))
+            """upgrades cooldown and updates variables when button is pressed"""
 
             if sell_button.draw_button():
                 self.add_money(self.selected_tower._sell_price)
@@ -434,15 +439,17 @@ class MainGameScreen:
                 self.placed_towers.remove(self.selected_tower)
                 self.selected_tower._position = (900, 900)
                 self.selected_tower = None
-            
+            """sells tower and updates variables when pressed"""
+
         else:
             health_box.draw()
-            # health_bar.draw()
+            """draws an empty gray box when no tower is selected"""
+
         self.tower1_price = self.font.render(f'$200', True, (255, 255, 255))
         self.archer_price = self.font.render(f'$150', True, (255, 255, 255))
         self.slingshot_price = self.font.render(f'$500', True, (255, 255, 255))
         self.cannon_price = self.font.render(f'$300', True, (255, 255, 255))
-        """Renders the price of tower1."""
+        """Renders the price of the towers."""
 
         for tower in self.placed_towers:
             """Renders each placed tower."""
