@@ -427,7 +427,7 @@ class MainGameScreen:
             width = image.get_width()
             height = image.get_height()
             scale = 1.5
-            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale) - 15))
             """creates an image to display in the menu to show the selected tower"""
 
             self.name_text = self.font.render(f"{self.selected_tower._name}", True, (255, 255, 255))
@@ -530,7 +530,7 @@ class MainGameScreen:
             """Draws each box in the tower_boxes list."""
             box.draw()
 
-        self.window.blit(normal_tower_image, (717, 100))
+        self.window.blit(normal_tower_image, (717, 105))
         self.window.blit(Archer_Tower_image, (705, 195))
         self.window.blit(slingshot_tower_image, (705, 295))
         self.window.blit(cannon_tower_image, (710, 395))
