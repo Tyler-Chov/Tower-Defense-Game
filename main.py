@@ -191,7 +191,7 @@ class MainGameScreen:
         self.window = window
         """The window for the game."""
         """Scales the image in self.background appropriately and then saves it back to self.background."""
-        self.font = pygame.font.SysFont(None, 22)
+        self.font = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 22)
         """Sets the font style to be used."""
         self.health = 0
         """Holds the amount of health the player has remaining."""
@@ -209,7 +209,7 @@ class MainGameScreen:
 
         self.game_pause_img = pygame.image.load(os.path.join('game_assests', 'pause.png'))
         self.game_pause_img = pygame.transform.scale(self.game_pause_img, (30, 30))
-        self.wave_pause = False
+        self.wave_pause = True
         self.pause = False
         """Sets pause to True when initially ran."""
         self.map = map
@@ -224,8 +224,8 @@ class MainGameScreen:
             """Loads the image."""
             self.music = pygame.mixer.music.load(os.path.join('game_assests/sounds', 'Stage_One_Song.mp3'))
             self.background = pygame.transform.scale(self.background, (window_width - 100, window_height - 100))
-            self.map_path = ((0, 274), (128, 274), (128, 124), (294, 124), (294, 328), (522, 328),
-                            (522, 226), (700, 226), (800, 226))
+            self.map_path = ((0, 274), (128, 274), (128, 118), (296, 118), (296, 328), (522, 328),
+                            (522, 222), (700, 222), (800, 222))
             """Sets the path for enemies to traverse."""
             self.collision_rects = [(0, 254, 128, 40), (108, 124, 40, 150), (128, 104, 166, 40), (274, 124, 40, 204), (294, 308, 228, 40), (502, 226, 40, 102), (522, 206, 178, 40), (700, 206, 100, 40)]
             """Sets up some collision spots, where the towers cannot be placed. (ie. the enemy path)"""
@@ -259,8 +259,8 @@ class MainGameScreen:
             self.selected_box_color = (136, 94, 66)
             """sets up the colors for the menu"""
 
-        self.wave_pause_button = text_button.Button(710, 510, 75, 75, "pause", self.box_color, window)
-        self.wave_play_button = text_button.Button(710, 510, 75, 75, "play", self.box_color, window)
+        self.wave_pause_button = text_button.Button(712, 510, 75, 75, "Pause", self.box_color, window)
+        self.wave_play_button = text_button.Button(712, 510, 75, 75, "Play", self.box_color, window)
         """Makes the pause button a button to be clicked, using the image stored in pause_img."""
 
         # Tower Variables
@@ -537,10 +537,10 @@ class MainGameScreen:
         self.window.blit(self.health_text, (705, 10))
         self.window.blit(self.money_text, (705, 40))
         self.window.blit(self.wave_text, (705, 70))
-        self.window.blit(self.tower1_price, (731, 167))
-        self.window.blit(self.archer_price, (731, 267))
-        self.window.blit(self.cannon_price, (731, 467))
-        self.window.blit(self.slingshot_price, (731, 367))
+        self.window.blit(self.tower1_price, (734, 167))
+        self.window.blit(self.archer_price, (734, 267))
+        self.window.blit(self.cannon_price, (734, 467))
+        self.window.blit(self.slingshot_price, (734, 367))
         if self.wave_pause == False:
             self.wave_pause_button.draw_button()
         if self.wave_pause == True:
@@ -623,8 +623,12 @@ class MainGameScreen:
                     else:
                         self.debug = True
                     return
+
+                if event.key == pygame.K_o:
+                    self.add_money(1000)
+                    return
                 
-    
+  
 
     def draw_radius(self, center, radius, color):
         range_surface = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
@@ -754,9 +758,9 @@ class MainGameScreen:
         overlay.fill((120, 120, 120, 100))
         self.window.blit(overlay, (0, 0))
 
-        font = pygame.font.SysFont(None, 40)
-        label_font = pygame.font.SysFont(None, 30)
-        setting_text = pygame.font.SysFont(None, 60)
+        font = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 40)
+        label_font = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 30)
+        setting_text = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 60)
 
         bgm_slider = Slider(self.window, window_width // 2 - 100, window_height // 2 - 50, 200, 20, min=0, max=10, step=1)
         bgm_slider.setValue(int(bgm_volume * 10))
@@ -812,8 +816,8 @@ class MainGameScreen:
         game_snapshot = self.window.copy() 
         overlay = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 128))  
-        font = pygame.font.SysFont(None, 30)
-        pause_font = pygame.font.SysFont(None, 80)
+        font = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 35)
+        pause_font = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 80)
         pause_text = pause_font.render("Paused", True, (255, 255, 255))
 
         button_width, button_height = 200, 50

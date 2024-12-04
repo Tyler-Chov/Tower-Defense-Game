@@ -355,7 +355,7 @@ class cannon_tower(Tower):
                     damage=self._damage,
                     size = 60,
                     image_path=self.projectile_image,
-                    AoE_radius= 70,
+                    AoE_radius= 90,
                     tower = self
                 )
                 projectiles_list.append(projectile)
