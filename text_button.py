@@ -1,9 +1,10 @@
 import pygame
 from pygame.locals import *
+import os
 
 pygame.init()
 
-font = pygame.font.SysFont(None , 26)
+font = pygame.font.Font(os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 26)
 
 #define colours
 bg = (204, 102, 0)
@@ -93,5 +94,5 @@ class Button():
         #add text to button
         text_img = font.render(self.text, True, self.text_col)
         text_len = text_img.get_width()
-        self.surface.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 25))
+        self.surface.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2) + 2, self.y + 25))
         return action
