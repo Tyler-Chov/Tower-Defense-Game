@@ -427,7 +427,7 @@ class MainGameScreen:
             width = image.get_width()
             height = image.get_height()
             scale = 1.5
-            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+            self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale) - 15))
             """creates an image to display in the menu to show the selected tower"""
 
             self.name_text = self.font.render(f"{self.selected_tower._name}", True, (255, 255, 255))
@@ -530,7 +530,7 @@ class MainGameScreen:
             """Draws each box in the tower_boxes list."""
             box.draw()
 
-        self.window.blit(normal_tower_image, (717, 100))
+        self.window.blit(normal_tower_image, (717, 105))
         self.window.blit(Archer_Tower_image, (705, 195))
         self.window.blit(slingshot_tower_image, (705, 295))
         self.window.blit(cannon_tower_image, (710, 395))
@@ -627,7 +627,7 @@ class MainGameScreen:
                 if event.key == pygame.K_o:
                     self.add_money(1000)
                     return
-                
+
   
 
     def draw_radius(self, center, radius, color):
@@ -673,6 +673,7 @@ class MainGameScreen:
             elif self.selected_tower_type == 3:
                 new_tower = cannon_tower()
             new_tower.update_volume(sound_volume)
+            
             if self.money >= new_tower.get_price():
                 new_tower.place(mouse_pos)
                 self.placed_towers.append(new_tower)
@@ -682,11 +683,6 @@ class MainGameScreen:
                 self.grid_active = False
                 self.selected_tower = False
                 return
-            # need to expand on this to allow for different towers
-            new_tower.place(mouse_pos)
-            self.placed_towers.append(new_tower)
-            self.grid_active = False
-            self.selected_tower = False
         else:
             #print("Cannot place the tower here. Collision detected.")
             pass
@@ -863,6 +859,7 @@ class MainGameScreen:
                         sys.exit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     paused = False 
+                
         self.pause = False
         self.wave_pause = False
 
@@ -877,7 +874,7 @@ class MainGameScreen:
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
     def remove_money(self, money):
-        self.money -= money
+        self.money -= int(money)
         self.money_text = self.font.render(f'Money: {self.money}', True, (255, 255, 255))
 
     def set_health(self, health):
