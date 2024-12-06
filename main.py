@@ -92,7 +92,15 @@ class StartScreen:
 
 
 class Stage_Select_Screen:
+    """Class for the stage selection screen. Allows the player to select a
+    stage and difficulty level."""
     def __init__(self, window):
+        """Initializes the stage selection screen with the window and loads
+        the background image and font.
+
+        Args:
+            window (pygame.Surface): The game window
+        """
         self.window = window
         self.background = pygame.image.load(os.path.join('game_assests',
                                                          'Stage_Select1.png'))
@@ -118,6 +126,8 @@ class Stage_Select_Screen:
             os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
 
     def render(self):
+        """Renders the stage selection screen with the background, stage
+        buttons, difficulty buttons, and start button."""
         if self.stage_selection == "stage1":
             self.background = pygame.image.load(
                 os.path.join('game_assests', 'Stage_Select1.png'))
@@ -158,6 +168,8 @@ class Stage_Select_Screen:
         pygame.display.update()
 
     def check_for_click(self):
+        """Checks for mouse click events and returns True if the start
+        button is clicked."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -194,18 +206,27 @@ class Stage_Select_Screen:
                     return True
 
     def _draw_overlay(self, rect):
+        """Draws a semi-transparent overlay on the given rectangle.
+
+        Args:
+            rect (pygame.Rect): The rectangle to draw the overlay on."""
         overlay = pygame.Surface((rect.width, rect.height))
         overlay.set_alpha(150)
         overlay.fill((0, 0, 0))
         self.window.blit(overlay, (rect.x, rect.y))
 
     def return_selection(self):
+        """Returns the selected stage and difficulty level.
+
+        Returns:
+            dict: A dictionary containing the selected stage and difficulty."""
         return {
             "stage": self.stage_selection,
             "difficulty": self.difficulty_selection
         }
 
     def reset_selection(self):
+        """Resets the stage and difficulty selection."""
         self.stage_selection = None
         self.difficulty_selection = None
 
@@ -241,12 +262,15 @@ class MainGameScreen:
 
         self.game_pause_img = pygame.image.load(os.path.join('game_assests',
                                                              'pause.png'))
+        """The image of the pause button."""
         self.game_pause_img = pygame.transform.scale(
             self.game_pause_img, (30, 30))
         self.wave_pause = True
+        """Sets the wave pause to True when initially ran."""
         self.pause = False
-        """Sets pause to True when initially ran."""
+        """Sets pause to False when initially ran."""
         self.map = map
+        """Sets the map to the map selected by the player."""
         self.return_to_stage_select = False
         self.projectiles = []
         self.explosions = []
@@ -702,6 +726,11 @@ class MainGameScreen:
         pygame.display.update()
 
     def check_for_click(self):
+        """Checks for mouse click events and returns the result.
+        
+        Returns:
+            str: The result of the click event.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -781,6 +810,13 @@ class MainGameScreen:
                     return
 
     def draw_radius(self, center, radius, color):
+        """Draws a circle around the tower to show the range of the tower.
+
+        Args:
+            center (tuple): The center of the circle.
+            radius (int): The radius of the circle.
+            color (tuple): The color of the circle.
+        """
         range_surface = pygame.Surface((radius * 2, radius * 2),
                                        pygame.SRCALPHA)
         range_surface.fill((0, 0, 0, 0))
@@ -791,6 +827,7 @@ class MainGameScreen:
         self.window.blit(range_surface, top_left)
 
     def render_tower_preview(self):
+        """Renders a preview of the tower that the player is currently"""
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if self.selected_tower_type == 0:
             temp_tower = normal_tower()
@@ -815,6 +852,11 @@ class MainGameScreen:
         )
 
     def place_tower(self, mouse_pos):
+        """Places a tower on the map at the given position.
+
+        Args:
+            mouse_pos (tuple): The position of the mouse.
+        """
         if not self.check_collision(mouse_pos[0], mouse_pos[1]):
             if self.selected_tower_type == 0:
                 new_tower = normal_tower()
@@ -843,6 +885,12 @@ class MainGameScreen:
             self.tower._position = None"""
 
     def check_collision(self, x, y):
+        """ Checks if the tower can be placed at the given position.
+
+        Args:
+            x (int): The x position of the tower.
+            y (int): The y position of the tower.
+        """
         preview_size = self.grid_size * self.tower_size
 
         preview_rect = pygame.Rect(
@@ -872,6 +920,7 @@ class MainGameScreen:
         return False
 
     def update_attacks(self):
+        """Updates the attacks of the towers."""
         for tower in self.placed_towers:
             tower.attack(self._enemy_list, self.projectiles)
         for enemy in self._enemy_list:
@@ -901,6 +950,8 @@ class MainGameScreen:
                 self._time_since_previous_spawn = 0
 
     def setting_screen(self):
+        """Displays the settings screen. Allows the player to adjust the
+        volume of the game."""
         global sound_volume, bgm_volume
 
         overlay = pygame.Surface((window_width, window_height))
@@ -973,6 +1024,11 @@ class MainGameScreen:
             pygame.display.flip()
 
     def pause_screen(self):
+        """Displays the pause screen. Allows the player to resume the game,
+        return to the stage select screen, or adjust the settings.
+
+        Returns:
+            str: The result of the pause screen if there is one."""
         paused = True
         game_snapshot = self.window.copy()
         overlay = pygame.Surface((window_width, window_height),
@@ -1048,6 +1104,7 @@ class MainGameScreen:
         self.wave_pause = False
 
     def remove_health(self, health):
+        ""
         self.health -= health
         self.health_text = self.font.render(f'Health: {self.health}',
                                             True, (255, 255, 255))
@@ -1083,6 +1140,7 @@ class MainGameScreen:
         self.window.blit(self.cursor_text, (10, 10))
 
     def draw_enemy_path(self):
+        """Draw the path that the enemies will take."""
         path_color = (255, 0, 0)
         path_width = 3
 

@@ -6,6 +6,13 @@ import os
 class Enemy:
     """Class that handles the creation of enemies"""
     def __init__(self, e_type,  path, difficulty):
+        """Initializes the enemy with the given parameters
+
+        Args:
+            e_type (str): The type of enemy
+            path (list): The path the enemy is supposed to follow
+            difficulty (str): The difficulty of the game.
+        """
         self._type = e_type
         if difficulty == 'easy':
             self.health_multiplier = 1
@@ -122,7 +129,11 @@ class Enemy:
 
     def render(self, window):
         """Renders the enemy, currently as a circle. Plan to render as
-        different shapes based on enemy type"""
+        different shapes based on enemy type
+
+        Args:
+            window (pygame.Surface): The game window
+        """
         x, y = int(self._position[0]), int(self._position[1])
         window.blit(self._image, (x - self._image.get_width() // 2,
                                   y - self._image.get_height() // 2))
@@ -130,7 +141,10 @@ class Enemy:
 
     def _draw_health_bar(self, window):
         """Creates a visual for the player to know the status of the enemy's
-        health."""
+        health. Health bar is a gradient.
+
+            Args:
+                window (pygame.Surface): The game window"""
         if self._max_health <= 0:
             return
 

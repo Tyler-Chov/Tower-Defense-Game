@@ -188,12 +188,20 @@ class Tower(ABC):
         }
 
     def load_sound(self, sound_path):
-        """Loads the sound effect for the tower."""
+        """Loads the sound effect for the tower.
+
+        Args:
+            sound_path (str): The path to the sound effect file.
+        """
         self._shoot_sound = pygame.mixer.Sound(
             os.path.join("game_assests/sounds", sound_path))
 
     def update_volume(self, new_volume):
-        """Updates the sound volume for the tower."""
+        """Updates the sound volume for the tower.
+
+        Args:
+            new_volume (float): The new volume level for the sound effect.
+        """
         if self._shoot_sound:
             self._shoot_sound.set_volume(new_volume)
 
@@ -230,7 +238,11 @@ class Archer_Tower(Tower):
         self.load_sound("archer_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
-        """Specific implementation for archer_tower's attack logic."""
+        """Specific implementation for archer_tower's attack logic.
+
+        Args:
+            enemies (list): List of Enemy objects.
+            projectiles_list (list): List of Projectile objects."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
             return
@@ -363,7 +375,11 @@ class cannon_tower(Tower):
         self.load_sound("cannon_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
-        """Specific implementation for archer_tower's attack logic."""
+        """Specific implementation for archer_tower's attack logic.
+
+        Args:
+            enemies (list): List of Enemy objects.
+            projectiles_list (list): List of Projectile objects."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
             return
@@ -496,7 +512,11 @@ class slingshot_tower(Tower):
         self.load_sound("slingshot_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
-        """Specific implementation for slingshot_tower's attack logic."""
+        """Specific implementation for slingshot_tower's attack logic.
+
+        Args:
+            enemies (list): List of Enemy objects.
+            projectiles_list (list): List of Projectile objects."""
         if self._cooldown_counter > 0:
             self._cooldown_counter -= 1
             return
