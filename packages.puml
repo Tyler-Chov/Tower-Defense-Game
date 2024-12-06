@@ -1,0 +1,21 @@
+@startuml packages
+set namespaceSeparator none
+package "enemy" as enemy {
+}
+package "main" as main {
+}
+package "projectile" as projectile {
+}
+package "text_button" as text_button {
+}
+package "tower" as tower {
+}
+package "waves" as waves {
+}
+main --> enemy
+main --> projectile
+main --> text_button
+main --> tower
+main --> waves
+tower --> projectile
+@enduml

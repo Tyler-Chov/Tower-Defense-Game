@@ -1,0 +1,198 @@
+@startuml classes
+set namespaceSeparator none
+class "Archer_Tower" as tower.Archer_Tower {
+  projectile_image
+  attack(enemies, projectiles_list)
+  upgrade_tower()
+}
+class "Button" as text_button.Button {
+  button_col : list
+  click_col : tuple
+  height : int
+  hover_col : tuple
+  surface
+  text
+  text_col : tuple
+  width : int
+  x
+  y
+  add_transparency(color)
+  darken(color)
+  draw_button()
+}
+class "Enemy" as enemy.Enemy {
+  health_multiplier : float, int
+  speed_multiplier : float, int
+  damage_base(base)
+  get_enemy_health()
+  get_enemy_speed()
+  get_enemy_strength()
+  get_enemy_type()
+  is_alive()
+  kill_enemy()
+  render(window)
+  reward_resources(base)
+  take_damage(damage)
+}
+class "Explosion" as projectile.Explosion {
+  is_active()
+  render(window)
+  update()
+}
+class "MainGameScreen" as main.MainGameScreen {
+  archer_price
+  attack_cooldown_text
+  attack_damage_text
+  background
+  background_color : tuple
+  box_color : tuple
+  cannon_price
+  collision_rects : list
+  cursor_text
+  debug : bool
+  difficulty
+  enemys_defeated_text
+  explosions : list
+  font : Font
+  game_pause_img
+  grid_active : bool
+  grid_size : int
+  health : int
+  health_text
+  image
+  map
+  map_path : tuple
+  money : int
+  money_text
+  music : NoneType
+  name_text
+  pause : bool
+  placed_towers : list
+  projectiles : list
+  return_to_stage_select : bool
+  selected_box_color : tuple
+  selected_tower : NoneType, bool
+  selected_tower_type : NoneType
+  sell_price_text
+  slingshot_price
+  tower1_price
+  tower_size : int
+  wave : int
+  wave_pause : bool
+  wave_pause_button
+  wave_play_button
+  wave_text
+  window
+  add_money(money)
+  check_collision(x, y)
+  check_for_click()
+  draw_enemy_path()
+  draw_radius(center, radius, color)
+  pause_screen()
+  place_tower(mouse_pos)
+  remove_health(health)
+  remove_money(money)
+  render()
+  render_collision_rects()
+  render_tower_preview()
+  set_health(health)
+  set_money(money)
+  setting_screen()
+  update_attacks()
+  update_cursor_position()
+  update_waves()
+}
+class "Projectile" as projectile.Projectile {
+  apply_splash_damage(enemies, explosions_list)
+  is_active()
+  move()
+  render(window)
+}
+class "Rectangle" as main.MainGameScreen.render.Rectangle {
+  color : tuple
+  height
+  rect
+  width
+  x
+  y
+  draw()
+  is_hovered(mouse_pos)
+}
+class "Stage_Select_Screen" as main.Stage_Select_Screen {
+  background
+  click_sound
+  difficulty_selection : NoneType, str
+  easy_button_rect
+  font : Font
+  hard_button_rect
+  hovered_difficulty : NoneType, str
+  hovered_stage : NoneType, str
+  medium_button_rect
+  music
+  selected_difficulty : NoneType
+  selected_stage : NoneType
+  stage1_button_rect
+  stage2_button_rect
+  stage3_button_rect
+  stage_selection : NoneType, str
+  start_button_hovered : bool
+  start_button_rect
+  window
+  check_for_click()
+  render()
+  reset_selection()
+  return_selection()
+}
+class "StartScreen" as main.StartScreen {
+  background
+  font : Font
+  start_button_rect
+  window
+  check_for_click()
+  render()
+}
+class "Tower" as tower.Tower {
+  projectile_image
+  size : int
+  attack(enemies, projectiles_list)
+  get_damage()
+  get_enemies_defeated()
+  get_name()
+  get_price()
+  get_range()
+  get_sell_price()
+  get_stats()
+  get_upgrade_cost()
+  load_sound(sound_path)
+  place(position)
+  render(window)
+  sell_tower()
+  set_attack_range(attack_range)
+  set_damage(damage)
+  set_name(name)
+  update_volume(new_volume)
+  upgrade_tower()
+}
+class "Wave" as waves.Wave {
+  spawn_enemy()
+}
+class "cannon_tower" as tower.cannon_tower {
+  projectile_image
+  attack(enemies, projectiles_list)
+  upgrade_tower()
+}
+class "normal_tower" as tower.normal_tower {
+  projectile_image
+}
+class "slingshot_tower" as tower.slingshot_tower {
+  projectile_image
+  attack(enemies, projectiles_list)
+  upgrade_tower()
+}
+tower.Archer_Tower --|> tower.Tower
+tower.cannon_tower --|> tower.Tower
+tower.normal_tower --|> tower.Tower
+tower.slingshot_tower --|> tower.Tower
+text_button.Button --* main.MainGameScreen : wave_pause_button
+text_button.Button --* main.MainGameScreen : wave_play_button
+@enduml
