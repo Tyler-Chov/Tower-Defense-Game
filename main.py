@@ -375,7 +375,7 @@ class MainGameScreen:
 
         self.wave_pause_button = text_button.Button(
             712, 510, 75, 75, "Pause", self.box_color, window)
-        """Creates the pause button as a button to be clicked, 
+        """Creates the pause button as a button to be clicked,
         using the text_button file."""
         self.wave_play_button = text_button.Button(
             712, 510, 75, 75, "Play", self.box_color, window)
@@ -767,7 +767,7 @@ class MainGameScreen:
 
     def check_for_click(self):
         """Checks for mouse click events and returns the result.
-        
+
         Returns:
             str: The result of the click event.
         """

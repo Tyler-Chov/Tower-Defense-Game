@@ -245,7 +245,6 @@ class normal_tower(Tower):
         self.load_sound("normal_tower_shoot.wav")
 
 
-
 class Archer_Tower(Tower):
     def __init__(self):
         """Initializes the Archer Tower with specific attributes."""
