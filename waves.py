@@ -25,4 +25,5 @@ class Wave:
 
     def _is_wave_complete(self):
         """Checks if the wave is complete"""
-        return self._enemy_number >= len(self._enemy_data) and all(not enemy.is_alive() for enemy in self._enemy_list)
+        return self._enemy_number >= len(self._enemy_data) and all(
+            not enemy.is_alive() for enemy in self._enemy_list)
