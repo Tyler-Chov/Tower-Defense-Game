@@ -1,4 +1,5 @@
-import pygame.draw, os
+import pygame.draw
+import os
 """pygame.draw used to more easily render enemies"""
 
 
@@ -16,34 +17,39 @@ class Enemy:
             self.health_multiplier = 2
             self.speed_multiplier = 2
 
-        """The type of enemy, to be used at a later date for different kinds of enemies"""
+        """The type of enemy, to be used at a later date for different
+        kinds of enemies"""
         if e_type == 'circle':
             self._speed = 1 * self.speed_multiplier
             self._strength = 1
             self._health = 50 * self.health_multiplier
             self._max_health = self._health
-            self._image = pygame.image.load(os.path.join("game_assests", "circle_ENEMY.png"))
+            self._image = pygame.image.load(os.path.join("game_assests",
+                                                         "circle_ENEMY.png"))
 
         if e_type == 'triangle':
             self._speed = 5 * self.speed_multiplier
             self._strength = 1
             self._health = 50 * self.health_multiplier
             self._max_health = self._health
-            self._image = pygame.image.load(os.path.join("game_assests", "Triangle Enemy.png"))
+            self._image = pygame.image.load(os.path.join("game_assests",
+                                                         "Triangle Enemy.png"))
 
         if e_type == 'rectangle':
             self._speed = 0.5 * self.speed_multiplier
             self._strength = 5
             self._health = 200 * self.health_multiplier
             self._max_health = self._health
-            self._image = pygame.image.load(os.path.join("game_assests", "Rectangle_Enemy.png"))
+            self._image = pygame.image.load(os.path.join(
+                "game_assests", "Rectangle_Enemy.png"))
 
         if e_type == 'ghost':
             self._speed = 1 * self.speed_multiplier
             self._strength = 20
             self._health = 1000 * self.health_multiplier
             self._max_health = self._health
-            self._image = pygame.image.load(os.path.join("game_assests", "Ghost-Enemy.png"))
+            self._image = pygame.image.load(os.path.join("game_assests",
+                                                         "Ghost-Enemy.png"))
 
         self._path = path
         """The path the enemy is supposed to follow"""
@@ -60,7 +66,8 @@ class Enemy:
             """Checks to see if the enemy has anywhere else to go."""
             target_x, target_y = self._path[self._path_index]
             """Finds the target x and y"""
-            dir_x, dir_y = target_x - self._position[0], target_y - self._position[1]
+            dir_x = target_x - self._position[0]
+            dir_y = target_y - self._position[1]
             """Sets the direction to go"""
             distance = (dir_x ** 2 + dir_y ** 2) ** 0.5
             """Helps adjust distance and move based on speed stat"""
@@ -114,22 +121,25 @@ class Enemy:
         return self._strength
 
     def render(self, window):
-        """Renders the enemy, currently as a circle. Plan to render as different shapes based on enemy type"""
+        """Renders the enemy, currently as a circle. Plan to render as
+        different shapes based on enemy type"""
         x, y = int(self._position[0]), int(self._position[1])
-        window.blit(self._image, (x - self._image.get_width() // 2, y - self._image.get_height() // 2))
+        window.blit(self._image, (x - self._image.get_width() // 2,
+                                  y - self._image.get_height() // 2))
         self._draw_health_bar(window)
 
     def _draw_health_bar(self, window):
-        """Creates a visual for the player to know the status of the enemy's health."""
-        if self._max_health <= 0: 
+        """Creates a visual for the player to know the status of the enemy's
+        health."""
+        if self._max_health <= 0:
             return
 
-        health_ratio = max(0, min(self._health / self._max_health, 1))  
+        health_ratio = max(0, min(self._health / self._max_health, 1))
         green = int(255 * health_ratio)
         red = 255 - green
         pygame.draw.rect(
-            window, 
-            (red, green, 0), 
-            (self._position[0] - 15, self._position[1] - 20, 30 * health_ratio, 5)
+            window,
+            (red, green, 0),
+            (self._position[0] - 15, self._position[1] - 20, 30 * health_ratio,
+             5)
         )
-
