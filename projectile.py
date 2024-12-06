@@ -20,18 +20,30 @@ class Projectile:
                 projectile. Defaults to "game_assests/projectile.png".
         """
         self._position = list(position)
+        """The position of the projectile"""
         self._target = target
+        """The target enemy"""
         self._speed = speed
+        """The speed of the projectile"""
         self._damage = damage
+        """The damage the projectile deals"""
         self._active = True
+        """The status of the projectile"""
         self._original_image = image_path
+        """The original image of the projectile"""
         self._current_image = self._original_image
+        """The current image of the projectile"""
         self._scaled_image = pygame.transform.scale(self._original_image,
                                                     (size, size))
+        """The scaled image of the projectile"""
         self._AoE_radius = AoE_radius
+        """The area of effect radius of the projectile"""
         self._size = size
+        """The size of the projectile"""
         self._explosions = []
+        """The list of explosions"""
         self._tower = tower
+        """The tower that fired the projectile"""
 
     def move(self):
         """Moves the projectile towards the target enemy. If the projectile
@@ -109,10 +121,15 @@ class Explosion:
             duration (int): The duration of the explosion
         """
         self._position = position
+        """The position of the explosion"""
         self._max_radius = max_radius
+        """The maximum radius of the explosion"""
         self._duration = duration
+        """The duration of the explosion"""
         self._current_frame = 0
+        """The current frame of the explosion"""
         self._active = True
+        """The status of the explosion"""
 
     def update(self):
         """Updates the explosion, deactivates it if the duration is reached"""

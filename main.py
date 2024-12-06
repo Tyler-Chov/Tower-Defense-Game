@@ -58,12 +58,16 @@ class StartScreen:
             window: The window surface where the start screen will be rendered.
         """
         self.window = window
+        """The pygame window to be used."""
         self.background = pygame.image.load(os.path.join('game_assests',
                                                          'Start_Screen.png'))
+        """The background image of the start screen."""
         self.background = pygame.transform.scale(self.background,
                                                  (window_width, window_height))
         self.font = pygame.font.SysFont(None, 55)
+        """The font used for rendering text on the start screen."""
         self.start_button_rect = pygame.Rect(310, 444, 180, 46)
+        """The rectangle area of the start button."""
 
     def render(self):
         """
@@ -102,28 +106,44 @@ class Stage_Select_Screen:
             window (pygame.Surface): The game window
         """
         self.window = window
+        """The pygame window to be used."""
         self.background = pygame.image.load(os.path.join('game_assests',
                                                          'Stage_Select1.png'))
+        """The background image of the stage selection screen."""
         self.background = pygame.transform.scale(self.background,
                                                  (window_width, window_height))
         self.font = pygame.font.SysFont(None, 55)
+        """The font used for rendering text on the stage selection screen."""
         self.stage_selection = "stage1"
+        """The selected stage."""
         self.difficulty_selection = None
+        """The selected difficulty level."""
         self.hovered_stage = None
+        """ Tracks if mouse is hovering over."""
         self.hovered_difficulty = None
+        """Tracks the difficulty level that the mouse is hovering over."""
         self.start_button_hovered = False
+        """The start button that the mouse can hovering over."""
         self.stage1_button_rect = pygame.Rect(147, 125, 236, 110)
+        """The rectangle area of the stage 1 button."""
         self.stage2_button_rect = pygame.Rect(147, 245, 236, 110)
+        """The rectangle area of the stage 2 button."""
         self.stage3_button_rect = pygame.Rect(147, 365, 236, 110)
+        """The rectangle area of the stage 3 button."""
         self.easy_button_rect = pygame.Rect(403, 398, 76, 34)
+        """The rectangle area of the easy difficulty button."""
         self.medium_button_rect = pygame.Rect(491, 398, 77, 34)
+        """The rectangle area of the medium difficulty button."""
         self.hard_button_rect = pygame.Rect(579, 398, 77, 34)
+        """The rectangle area of the hard difficulty button."""
         self.start_button_rect = pygame.Rect(402, 441, 254, 37)
-
+        """The rectangle area of the start button."""
         self.click_sound = pygame.mixer.Sound(
             os.path.join('game_assests/sounds', 'click.mp3'))
+        """The sound effect for clicking buttons."""
         self.music = pygame.mixer.music.load(
             os.path.join('game_assests/sounds', 'stage_selection_music.mp3'))
+        """The background music for the stage selection screen."""
 
     def render(self):
         """Renders the stage selection screen with the background, stage
@@ -272,10 +292,15 @@ class MainGameScreen:
         self.map = map
         """Sets the map to the map selected by the player."""
         self.return_to_stage_select = False
+        """Tracks if the player wants to return to the stage select screen."""
         self.projectiles = []
+        """A list to hold all the projectiles that have been fired."""
         self.explosions = []
+        """A list to hold all the explosions that have been created."""
         self.background_color = grey
+        """Background color for the game."""
         self.music = None
+        """Tracks the music currently playing."""
         # Map Variables
         if self.map == 1:
             self.background = pygame.image.load(os.path.join('game_assests',
@@ -297,25 +322,32 @@ class MainGameScreen:
             ie. the enemy path)"""
 
             self.background_color = (146, 114, 86)
+            """Sets the background color."""
             self.box_color = (166, 134, 106)
+            """Sets the color of the boxes."""
             self.selected_box_color = (126, 94, 66)
             """sets up the colors for the menu"""
 
         elif map == 2:
+            """Sets up the second map."""
             self.background = pygame.image.load(
                 os.path.join('game_assests', 'map_two.png'))
+            """Loads the map."""
             self.music = pygame.mixer.music.load(
                 os.path.join('game_assests/sounds', 'Stage_Two_Song.mp3'))
+            """Loads the music."""
             self.background = pygame.transform.scale(
                 self.background, (window_width - 100, window_height - 100))
             self.map_path = ((84, 0), (84, 184), (360, 184), (360, 346),
                              (84, 346), (84, 454), (530, 454), (530, 134),
                              (750, 134), (800, 134))
+            """Sets the path"""
             self.collision_rects = [(64, 0, 40, 184), (84, 164, 276, 40),
                                     (340, 184, 40, 162), (84, 326, 276, 40),
                                     (64, 346, 40, 108), (84, 434, 446, 40),
                                     (510, 134, 40, 320), (530, 114, 220, 40),
                                     (750, 114, 50, 40)]
+            """Sets up the collision spots."""
             self.background_color = (122, 155, 199)
             self.box_color = (142, 175, 219)
             self.selected_box_color = (102, 135, 179)
@@ -343,10 +375,12 @@ class MainGameScreen:
 
         self.wave_pause_button = text_button.Button(
             712, 510, 75, 75, "Pause", self.box_color, window)
+        """Creates the pause button as a button to be clicked, 
+        using the text_button file."""
         self.wave_play_button = text_button.Button(
             712, 510, 75, 75, "Play", self.box_color, window)
-        """Makes the pause button a button to be clicked, using the image
-        stored in pause_img."""
+        """Makes the pause button a button to be clicked, using the
+        text_button module"""
 
         # Tower Variables
         self.grid_active = False
@@ -356,19 +390,25 @@ class MainGameScreen:
         self.tower_size = 3
         """Determines the tower size"""
         self.selected_tower = None
-        self.selected_tower_type = None
         """Determines which tower the player has selected."""
+        self.selected_tower_type = None
+        """Determines which tower type the player has selected for placing."""
         self.placed_towers = []
         """A list to hold all the towers that have been placed."""
 
         # Wave and Enemy
         self.difficulty = difficulty
+        """Determines the difficulty of the game."""
         self.wave = 1
         """Stores which wave number is currently displayed to the player"""
         self._waves = []  # list of waves
+        """A list to hold all the waves of enemies."""
         self._time_since_previous_spawn = 0
+        """Determines the time since the previous spawn."""
         self._enemy_list = []
+        """A list to hold all the enemies that have been spawned."""
         self._current_wave = 0
+        """Determines the current wave."""
         self.wave_text = self.font.render(
             f'Wave: {self.wave}', True, (255, 255, 255))
         """Renders the current wave number."""

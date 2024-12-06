@@ -28,25 +28,43 @@ class Tower(ABC):
                  attack_range: int, attack_pattern: int):
         """Initializes the Tower with its primary attributes."""
         self._name = name
+        """The name of the tower."""
         self._damage = damage
+        """The damage dealt per attack."""
         self._shot_cooldown = shot_cooldown * 60
+        """The time between attacks in frames."""
         self._price = price
+        """The cost to build the tower."""
         self._sell_price = int(price * 0.25)
+        """The sell price of the tower."""
         self._attack_range = attack_range
+        """ The attack range for hitting enemies."""
         self._attack_pattern = attack_pattern
+        """The specific attack style of the tower."""
         self._position = None
+        """ The position of the tower on the screen."""
         self._upgrade_level = 1
+        """ The current level of the tower."""
         self._upgrade_cost = int(price + (price * 0.5))
+        """ The cost to upgrade the tower to the next level."""
         self._enemies_defeated = 0
+        """ The count of enemies defeated by this tower."""
         self._cooldown_counter = 0
+        """ The current cooldown counter for the tower."""
         self._image = pygame.image.load(os.path.join(
             'game_assests', "tower.png"))
+        """ The image of the tower."""
         self.size = 28
+        """ The size of the tower."""
         self.projectile_image = pygame.image.load(os.path.join(
             'game_assests', "projectile.png"))
+        """ The image of the projectile."""
         self._flipped_image = pygame.transform.flip(self._image, True, False)
+        """ The flipped image of the tower."""
         self._is_facing_left = False
+        """ The direction the tower is facing."""
         self._shoot_sound = None
+        """ The sound effect for the tower's attack."""
 
     def render(self, window):
         """Draws the tower image on the game window at its position."""
@@ -212,14 +230,20 @@ class normal_tower(Tower):
         super().__init__(name="Normal Tower", damage=30, shot_cooldown=4,
                          price=200, attack_range=75, attack_pattern=1)
         self._upgrade_level = 1
+        """The current level of the tower."""
         self._upgrade_cost = self._price + (self._price * 0.25)
+        """The cost to upgrade the tower to the next level."""
         self._image = pygame.image.load(
             os.path.join('game_assests', "Basic_Tower.png"))
+        """The image of the tower."""
         self.projectile_image = pygame.image.load(
             os.path.join('game_assests', "projectile.png"))
+        """The image of the projectile."""
         self._flipped_image = pygame.transform.flip(
             self._image, True, False)
+        """The flipped image of the tower."""
         self.load_sound("normal_tower_shoot.wav")
+
 
 
 class Archer_Tower(Tower):
@@ -228,13 +252,18 @@ class Archer_Tower(Tower):
         super().__init__(name="Archer Tower", damage=20, shot_cooldown=2,
                          price=150, attack_range=75, attack_pattern=1)
         self._upgrade_level = 1
+        """The current level of the tower."""
         self._upgrade_cost = self._price + (self._price * 0.25)
+        """The cost to upgrade the tower to the next level."""
         self._image = pygame.image.load(
             os.path.join('game_assests', "Archer_Tower.png"))
+        """The image of the tower."""
         self._flipped_image = pygame.transform.flip(
             self._image, True, False)
+        """The flipped image of the tower."""
         self.projectile_image = pygame.image.load(
             os.path.join('game_assests', "arrow.png"))
+        """The image of the projectile."""
         self.load_sound("archer_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
@@ -366,12 +395,17 @@ class cannon_tower(Tower):
         super().__init__(name="Cannon Tower", damage=40, shot_cooldown=7,
                          price=300, attack_range=70, attack_pattern=1)
         self._upgrade_level = 1
+        """The current level of the tower."""
         self._upgrade_cost = self._price + (self._price * 0.25)
+        """The cost to upgrade the tower to the next level."""
         self._image = pygame.image.load(
             os.path.join('game_assests', "cannon_tower.png"))
+        """The image of the tower."""
         self.projectile_image = pygame.image.load(os.path.join(
             'game_assests', "projectile.png"))
+        """The image of the projectile."""
         self._flipped_image = pygame.transform.flip(self._image, True, False)
+        """The flipped image of the tower."""
         self.load_sound("cannon_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):
@@ -503,12 +537,17 @@ class slingshot_tower(Tower):
         super().__init__(name="Slingshot Tower", damage=80, shot_cooldown=7,
                          price=400, attack_range=150, attack_pattern=1)
         self._upgrade_level = 1
+        """The current level of the tower."""
         self._upgrade_cost = self._price + (self._price * 0.25)
+        """The cost to upgrade the tower to the next level."""
         self._image = pygame.image.load(
             os.path.join('game_assests', "slingshot_tower.png"))
+        """The image of the tower."""
         self._flipped_image = pygame.transform.flip(self._image, True, False)
+        """ The flipped image of the tower."""
         self.projectile_image = pygame.image.load(
             os.path.join('game_assests', "projectile.png"))
+        """The image of the projectile."""
         self.load_sound("slingshot_tower_shoot.wav")
 
     def attack(self, enemies, projectiles_list):

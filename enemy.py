@@ -14,9 +14,12 @@ class Enemy:
             difficulty (str): The difficulty of the game.
         """
         self._type = e_type
+        """The type of enemy"""
         if difficulty == 'easy':
             self.health_multiplier = 1
+            """The health multiplier for the enemy"""
             self.speed_multiplier = 1
+            """The speed multiplier for the enemy"""
         if difficulty == 'medium':
             self.health_multiplier = 1.5
             self.speed_multiplier = 1.5
@@ -28,11 +31,16 @@ class Enemy:
         kinds of enemies"""
         if e_type == 'circle':
             self._speed = 1 * self.speed_multiplier
+            """The speed of the enemy"""
             self._strength = 1
+            """The strength of the enemy"""
             self._health = 50 * self.health_multiplier
+            """The health of the enemy"""
             self._max_health = self._health
+            """The max health of the enemy"""
             self._image = pygame.image.load(os.path.join("game_assests",
                                                          "circle_ENEMY.png"))
+            """The image of the enemy"""
 
         if e_type == 'triangle':
             self._speed = 5 * self.speed_multiplier
@@ -63,6 +71,7 @@ class Enemy:
         self._position = self._path[0]
         """Initially set at the starting point on the path"""
         self._path_index = 0
+        """The index of the path the enemy is currently at in the path list"""
         self._status = True
         """Means the enemy is alive"""
         self._resource_worth = self._health

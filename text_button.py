@@ -30,12 +30,19 @@ class Button():
 
     def __init__(self, x, y, width, height, text, color, surface):
         self.x = x
+        """The x position of the button"""
         self.y = y
+        """The y position of the button"""
         self.width = width
+        """The width of the button"""
         self.height = height
+        """The height of the button"""
         self.text = text
+        """The text on the button"""
         self.button_col = self.add_transparency(color)
+        """The color of the button"""
         self.surface = surface
+        """The surface the button is drawn on"""
         self.hover_col = self.darken(color)
         self.hover_col = self.add_transparency(self.hover_col)
         self.click_col = self.hover_col
