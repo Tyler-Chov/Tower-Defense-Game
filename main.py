@@ -11,25 +11,29 @@ from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 import text_button
 
-FPS = 60
-fpsClock = pygame.time.Clock()
-window_width = 800
-window_height = 600
-global sound_volume
-global bgm_volume
-sound_volume = 1
-bgm_volume = 1
+_FPS = 60
+_fpsClock = pygame.time.Clock()
+_window_width = 800
+_window_height = 600
+global _sound_volume
+"""The volume of the sound effects."""
+global _bgm_volume
+"""The volume of the background music."""
+_sound_volume = 1
+
+_bgm_volume = 1
 pygame.display.set_caption('Tower Defense Game')
 pygame.init()
-window = pygame.display.set_mode((window_width, window_height))
+window = pygame.display.set_mode((_window_width, _window_height))
+"""The window for the game."""
 
 # Define colours
-bg = (204, 102, 0)
-red = (255, 0, 0)
-black = (0, 0, 0)
-white = (255, 255, 255)
-green = (0, 180, 0)
-grey = (100, 100, 100)
+_bg = (204, 102, 0)
+_red = (255, 0, 0)
+_black = (0, 0, 0)
+_white = (255, 255, 255)
+_green = (0, 180, 0)
+_grey = (100, 100, 100)
 
 
 class StartScreen:
@@ -63,7 +67,8 @@ class StartScreen:
                                                          'Start_Screen.png'))
         """The background image of the start screen."""
         self.background = pygame.transform.scale(self.background,
-                                                 (window_width, window_height))
+                                                 (_window_width,
+                                                  _window_height))
         self.font = pygame.font.SysFont(None, 55)
         """The font used for rendering text on the start screen."""
         self.start_button_rect = pygame.Rect(310, 444, 180, 46)
@@ -111,7 +116,8 @@ class Stage_Select_Screen:
                                                          'Stage_Select1.png'))
         """The background image of the stage selection screen."""
         self.background = pygame.transform.scale(self.background,
-                                                 (window_width, window_height))
+                                                 (_window_width,
+                                                  _window_height))
         self.font = pygame.font.SysFont(None, 55)
         """The font used for rendering text on the stage selection screen."""
         self.stage_selection = "stage1"
@@ -152,17 +158,17 @@ class Stage_Select_Screen:
             self.background = pygame.image.load(
                 os.path.join('game_assests', 'Stage_Select1.png'))
             self.background = pygame.transform.scale(
-                self.background, (window_width, window_height))
+                self.background, (_window_width, _window_height))
         elif self.stage_selection == "stage2":
             self.background = pygame.image.load(
                 os.path.join('game_assests', 'Stage_Select2.png'))
             self.background = pygame.transform.scale(
-                self.background, (window_width, window_height))
+                self.background, (_window_width, _window_height))
         elif self.stage_selection == "stage3":
             self.background = pygame.image.load(
                 os.path.join('game_assests', 'Stage_Select3.png'))
             self.background = pygame.transform.scale(
-                self.background, (window_width, window_height))
+                self.background, (_window_width, _window_height))
 
         self.window.blit(self.background, (0, 0))
         if (self.hovered_stage == "stage1"
@@ -216,7 +222,7 @@ class Stage_Select_Screen:
             if self.start_button_rect.collidepoint(mouse_pos):
                 self.start_button_hovered = True
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.click_sound.set_volume(sound_volume)
+                self.click_sound.set_volume(_sound_volume)
                 pygame.mixer.Sound.play(self.click_sound)
                 if self.hovered_stage:
                     self.stage_selection = self.hovered_stage
@@ -297,7 +303,7 @@ class MainGameScreen:
         """A list to hold all the projectiles that have been fired."""
         self.explosions = []
         """A list to hold all the explosions that have been created."""
-        self.background_color = grey
+        self.background_color = _grey
         """Background color for the game."""
         self.music = None
         """Tracks the music currently playing."""
@@ -309,7 +315,7 @@ class MainGameScreen:
             self.music = pygame.mixer.music.load(os.path.join(
                 'game_assests/sounds', 'Stage_One_Song.mp3'))
             self.background = pygame.transform.scale(
-                self.background, (window_width - 100, window_height - 100))
+                self.background, (_window_width - 100, _window_height - 100))
             self.map_path = ((0, 274), (128, 274), (128, 118), (296, 118),
                              (296, 328), (522, 328), (522, 222), (700, 222),
                              (800, 222))
@@ -337,7 +343,7 @@ class MainGameScreen:
                 os.path.join('game_assests/sounds', 'Stage_Two_Song.mp3'))
             """Loads the music."""
             self.background = pygame.transform.scale(
-                self.background, (window_width - 100, window_height - 100))
+                self.background, (_window_width - 100, _window_height - 100))
             self.map_path = ((84, 0), (84, 184), (360, 184), (360, 346),
                              (84, 346), (84, 454), (530, 454), (530, 134),
                              (750, 134), (800, 134))
@@ -358,7 +364,7 @@ class MainGameScreen:
             self.background = pygame.image.load(
                 os.path.join('game_assests', 'map_three.png'))
             self.background = pygame.transform.scale(
-                self.background, (window_width - 100, window_height - 100))
+                self.background, (_window_width - 100, _window_height - 100))
             self.map_path = ((0, 398), (364, 398), (364, 134), (88, 134),
                              (88, 242), (530, 242), (530, 396), (644, 396),
                              (644, 184), (750, 184), (800, 184))
@@ -401,7 +407,7 @@ class MainGameScreen:
         """Determines the difficulty of the game."""
         self.wave = 1
         """Stores which wave number is currently displayed to the player"""
-        self._waves = []  # list of waves
+        self._waves = []
         """A list to hold all the waves of enemies."""
         self._time_since_previous_spawn = 0
         """Determines the time since the previous spawn."""
@@ -545,11 +551,13 @@ class MainGameScreen:
 
         # create menus, tower slots, and tower image
         side_bar = Rectangle(
-            (window_width - 100), 0, 100, window_height, self.background_color)
+            (_window_width - 100), 0, 100, _window_height,
+            self.background_color)
         """Menu on the right side, shows player stats and towers that can
         be used."""
         bottom_bar = Rectangle(
-            0, (window_height - 100), window_width, 100, self.background_color)
+            0, (_window_height - 100), _window_width, 100,
+            self.background_color)
         """Menu on the bottom, currently hold nothing."""
 
         box_unselected_color = self.box_color
@@ -613,13 +621,13 @@ class MainGameScreen:
             upgrade_damage_button = text_button.Button(
                 210, 540, 180, 50,
                 (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"),
-                green, window)
+                _green, window)
             upgrade_cooldown_button = text_button.Button(
                 410, 540, 180, 50,
                 (f"Upgrade for: ${int(self.selected_tower._upgrade_cost)}"),
-                green, window)
+                _green, window)
             sell_button = text_button.Button(
-                605, 540, 90, 50, (f"Sell"), red, window)
+                605, 540, 90, 50, (f"Sell"), _red, window)
             """creates the buttons for the tower"""
 
             image = self.selected_tower._image
@@ -672,7 +680,6 @@ class MainGameScreen:
             if sell_button.draw_button():
                 self.add_money(self.selected_tower._sell_price)
                 self.selected_tower.sell_tower
-                # TODO - add logic for removing towers
                 self.placed_towers.remove(self.selected_tower)
                 self.selected_tower._position = (900, 900)
                 self.selected_tower = None
@@ -794,8 +801,8 @@ class MainGameScreen:
 
                 # selecting towers.
                 tower_clicked = False
-                bottom_bar = pygame.rect.Rect(0, (window_height - 100),
-                                              window_width, 100)
+                bottom_bar = pygame.rect.Rect(0, (_window_height - 100),
+                                              _window_width, 100)
                 for tower in self.placed_towers:
                     tower_size = int(self.grid_size * self.tower_size * 0.8)
                     tower_rect = pygame.rect.Rect(
@@ -906,7 +913,7 @@ class MainGameScreen:
                 new_tower = slingshot_tower()
             elif self.selected_tower_type == 3:
                 new_tower = cannon_tower()
-            new_tower.update_volume(sound_volume)
+            new_tower.update_volume(_sound_volume)
 
             if self.money >= new_tower.get_price():
                 new_tower.place(mouse_pos)
@@ -951,8 +958,8 @@ class MainGameScreen:
         for rect in self.collision_rects:
             if preview_rect.colliderect(rect):
                 return True
-        bottom_bar = pygame.Rect(0, window_height - 100, window_width, 100)
-        side_bar = pygame.Rect(window_width - 100, 0, 100, window_height)
+        bottom_bar = pygame.Rect(0, _window_height - 100, _window_width, 100)
+        side_bar = pygame.Rect(_window_width - 100, 0, 100, _window_height)
 
         if (preview_rect.colliderect(bottom_bar) or preview_rect.colliderect(
                 side_bar)):
@@ -992,9 +999,9 @@ class MainGameScreen:
     def setting_screen(self):
         """Displays the settings screen. Allows the player to adjust the
         volume of the game."""
-        global sound_volume, bgm_volume
+        global _sound_volume, _bgm_volume
 
-        overlay = pygame.Surface((window_width, window_height))
+        overlay = pygame.Surface((_window_width, _window_height))
         overlay.fill((120, 120, 120, 100))
         self.window.blit(overlay, (0, 0))
 
@@ -1005,25 +1012,27 @@ class MainGameScreen:
         setting_text = pygame.font.Font(
             os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 60)
 
-        bgm_slider = Slider(self.window, window_width // 2 - 100, window_height
-                            // 2 - 50, 200, 20, min=0, max=10, step=1)
-        bgm_slider.setValue(int(bgm_volume * 10))
-        sfx_slider = Slider(self.window, window_width // 2 - 100, window_height
-                            // 2 + 50, 200, 20, min=0, max=10, step=1)
-        sfx_slider.setValue(int(sound_volume * 10))
+        bgm_slider = Slider(self.window, _window_width // 2 - 100,
+                            _window_height // 2 - 50, 200, 20, min=0,
+                            max=10, step=1)
+        bgm_slider.setValue(int(_bgm_volume * 10))
+        sfx_slider = Slider(self.window, _window_width // 2 - 100,
+                            _window_height // 2 + 50, 200, 20, min=0,
+                            max=10, step=1)
+        sfx_slider.setValue(int(_sound_volume * 10))
 
         bgm_label = label_font.render("BGM", True, (255, 255, 255))
-        bgm_label_rect = bgm_label.get_rect(center=(window_width // 2,
-                                                    window_height // 2 - 80))
+        bgm_label_rect = bgm_label.get_rect(center=(_window_width // 2,
+                                                    _window_height // 2 - 80))
         sfx_label = label_font.render("SFX", True, (255, 255, 255))
-        sfx_label_rect = sfx_label.get_rect(center=(window_width // 2,
-                                                    window_height // 2 + 20))
-        back_button_rect = pygame.Rect(window_width // 2 - 100,
-                                       window_height - 100, 200, 50)
+        sfx_label_rect = sfx_label.get_rect(center=(_window_width // 2,
+                                                    _window_height // 2 + 20))
+        back_button_rect = pygame.Rect(_window_width // 2 - 100,
+                                       _window_height - 100, 200, 50)
         back_text = font.render("Back", True, (255, 255, 255))
         setting_text = setting_text.render("Settings", True, (255, 255, 255))
         setting_text_rect = setting_text.get_rect(
-            center=(window_width // 2, 120))
+            center=(_window_width // 2, 120))
 
         running = True
         while running:
@@ -1041,13 +1050,12 @@ class MainGameScreen:
             pygame_widgets.update(events)
             bgm_value = bgm_slider.getValue() / 10.0
             sfx_value = sfx_slider.getValue() / 10.0
-            bgm_volume = bgm_value
-            sound_volume = sfx_value
-            pygame.mixer.music.set_volume(bgm_volume)
+            _bgm_volume = bgm_value
+            _sound_volume = sfx_value
+            pygame.mixer.music.set_volume(_bgm_volume)
 
-            # Update the volume of all towers
             for tower in self.placed_towers:
-                tower.update_volume(sound_volume)
+                tower.update_volume(_sound_volume)
 
             self.window.fill((30, 30, 30))
             self.window.blit(overlay, (0, 0))
@@ -1071,7 +1079,7 @@ class MainGameScreen:
             str: The result of the pause screen if there is one."""
         paused = True
         game_snapshot = self.window.copy()
-        overlay = pygame.Surface((window_width, window_height),
+        overlay = pygame.Surface((_window_width, _window_height),
                                  pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 128))
         font = pygame.font.Font(os.path.join('game_assests',
@@ -1081,15 +1089,16 @@ class MainGameScreen:
         pause_text = pause_font.render("Paused", True, (255, 255, 255))
 
         button_width, button_height = 200, 50
-        resume_button_rect = pygame.Rect(window_width // 2 - button_width // 2,
-                                         220, button_width, button_height)
-        stage_select_button_rect = pygame.Rect(window_width // 2 - button_width
-                                               // 2, 290, button_width,
-                                               button_height)
-        setting_button_rect = pygame.Rect(window_width // 2 - button_width
+        resume_button_rect = pygame.Rect(_window_width // 2 - button_width
+                                         // 2, 220, button_width,
+                                         button_height)
+        stage_select_button_rect = pygame.Rect(_window_width // 2 -
+                                               button_width // 2, 290,
+                                               button_width, button_height)
+        setting_button_rect = pygame.Rect(_window_width // 2 - button_width
                                           // 2, 360, button_width,
                                           button_height)
-        quit_button_rect = pygame.Rect(window_width // 2 - button_width // 2,
+        quit_button_rect = pygame.Rect(_window_width // 2 - button_width // 2,
                                        430, button_width, button_height)
 
         resume_text = font.render("Resume", True, (255, 255, 255))
@@ -1100,7 +1109,7 @@ class MainGameScreen:
         while paused:
             self.window.blit(game_snapshot, (0, 0))
             self.window.blit(overlay, (0, 0))
-            self.window.blit(pause_text, (window_width // 2 -
+            self.window.blit(pause_text, (_window_width // 2 -
                                           pause_text.get_width() // 2, 100))
             cursor_pos = pygame.mouse.get_pos()
             for button_rect, text, color in [
@@ -1143,8 +1152,28 @@ class MainGameScreen:
         self.pause = False
         self.wave_pause = False
 
+    def game_over(self):
+        """Displays the game over screen and exits the game."""
+        overlay = pygame.Surface((_window_width, _window_height),
+                                 pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 128))
+        self.window.blit(overlay, (0, 0))
+        font = pygame.font.Font(os.path.join('game_assests',
+                                             'EXEPixelPerfect.ttf'), 50)
+        game_over_text = font.render("Game Over", True, (255, 0, 0))
+        text_rect = game_over_text.get_rect(center=(_window_width // 2,
+                                                    _window_height // 2))
+        self.window.blit(game_over_text, text_rect)
+        pygame.display.update()
+        pygame.time.wait(3000)
+        pygame.quit()
+        sys.exit()
+
     def remove_health(self, health):
-        ""
+        """Removes health from the player.
+
+        Args:
+            health (int): The amount of health to be removed."""
         self.health -= health
         self.health_text = self.font.render(f'Health: {self.health}',
                                             True, (255, 255, 255))
@@ -1152,21 +1181,36 @@ class MainGameScreen:
             self.game_over()
 
     def add_money(self, money):
+        """Adds money to the player.
+
+        Args:
+            money (int): The amount of money to be added."""
         self.money += int(money)
         self.money_text = self.font.render(f'Money: {self.money}',
                                            True, (255, 255, 255))
 
     def remove_money(self, money):
+        """Removes money from the player.
+
+        Args:
+            money (int): The amount of money to be removed."""
         self.money -= int(money)
         self.money_text = self.font.render(f'Money: {self.money}',
                                            True, (255, 255, 255))
 
     def set_health(self, health):
+        """Sets the health of the player.
+        Args:
+            health (int): The amount of health to be set."""
         self.health = health
         self.health_text = self.font.render(f'Health: {self.health}',
                                             True, (255, 255, 255))
 
     def set_money(self, money):
+        """Sets the money of the player.
+
+        Args:
+            money (int): The amount of money to be set."""
         self.money = money
         self.money_text = self.font.render(f'Money: {self.money}',
                                            True, (255, 255, 255))
@@ -1259,7 +1303,7 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        fpsClock.tick(FPS)
+        _fpsClock.tick(_FPS)
 
 
 if __name__ == '__main__':

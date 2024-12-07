@@ -6,27 +6,34 @@ pygame.init()
 
 font = pygame.font.Font(
     os.path.join('game_assests', 'EXEPixelPerfect.ttf'), 26)
+"""The font used for the button"""
 
 # define colours
-bg = (204, 102, 0)
-red = (255, 0, 0)
-black = (0, 0, 0)
-white = (255, 255, 255)
-green = (0, 180, 0)
-grey = 100, 100, 100
+_bg = (204, 102, 0)
+_red = (255, 0, 0)
+_black = (0, 0, 0)
+_white = (255, 255, 255)
+_green = (0, 180, 0)
+_grey = 100, 100, 100
 
 # define global variable
 clicked = False
-counter = 0
+"""The status of the button click"""
+_counter = 0
 
 
 class Button():
     # colours for button and text
     hover_col = (0, 225, 0)
+    """The color of the button when hovered over"""
     click_col = (0, 150, 0)
-    text_col = white
+    """The color of the button when clicked"""
+    text_col = _white
+    """The color of the text on the button"""
     width = 100
+    """The width of the button"""
     height = 50
+    """The height of the button"""
 
     def __init__(self, x, y, width, height, text, color, surface):
         self.x = x
@@ -49,8 +56,8 @@ class Button():
 
     def darken(self, color):
         """returns a color 25 values darker than one that is given"""
-        if color == black:
-            return grey
+        if color == _black:
+            return _grey
         new_color = []
         for i in range(3):
             new_color.append(color[i])
@@ -67,7 +74,7 @@ class Button():
         return new_color
 
     def draw_button(self):
-
+        """draws the button on the surface"""
         global clicked
         action = False
 
@@ -94,13 +101,13 @@ class Button():
             pygame.draw.rect(self.surface, self.button_col, button_rect)
 
         # add shading to button
-        pygame.draw.line(self.surface, white, (self.x, self.y),
+        pygame.draw.line(self.surface, _white, (self.x, self.y),
                          (self.x + self.width, self.y), 2)
-        pygame.draw.line(self.surface, white, (self.x, self.y),
+        pygame.draw.line(self.surface, _white, (self.x, self.y),
                          (self.x, self.y + self.height), 2)
-        pygame.draw.line(self.surface, black, (self.x, self.y + self.height),
+        pygame.draw.line(self.surface, _black, (self.x, self.y + self.height),
                          (self.x + self.width, self.y + self.height), 2)
-        pygame.draw.line(self.surface, black, (self.x + self.width, self.y),
+        pygame.draw.line(self.surface, _black, (self.x + self.width, self.y),
                          (self.x + self.width, self.y + self.height), 2)
 
         # add text to button
