@@ -1,2 +1,3 @@
 # Tower-Defense-Game
-Work in Progress Tower Defense Game FOR CIS 350 
+Completed School Project for our CIS 350 class. Since the project has been submitted, we are no longer working on this repository.
+Feel free to fork this repo.
